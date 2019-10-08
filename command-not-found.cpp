@@ -103,7 +103,7 @@ list<string> x11_commands = {
 #endif
 };
 
-struct info {string owner, repository;};
+struct info {string binary, repository;};
 
 inline int termux_min3(int a, int b, int c) {
   return (a < b ? (a < c ? a : c) : (b < c ? b : c));
@@ -175,12 +175,12 @@ int termux_look_for_packages(const char* command_not_found, list<string>* cmds, 
         return -distance;
       } else if (*best_distance == distance) {
         // As good as our previously best match
-        (*pkg_map).insert(pair<string,info>(current_binary, {current_package, repository}));
+        (*pkg_map).insert(pair<string,info>(current_package, {current_binary, repository}));
       } else if (*best_distance == -1 || distance < *best_distance) {
         // New best match
         (*pkg_map).clear();
         *best_distance = distance;
-        (*pkg_map).insert(pair<string,info>(current_binary, {current_package, repository}));
+        (*pkg_map).insert(pair<string,info>(current_package, {current_binary, repository}));
       }
     }
   }
@@ -195,7 +195,7 @@ int main(int argc, const char *argv[]) {
 
   const char *command = argv[1];
   int best_distance = -1;
-  struct info {string owner, repository;};
+  struct info {string binary, repository;};
   map <string, info> package_map;
   int res;
 
@@ -222,7 +222,7 @@ int main(int argc, const char *argv[]) {
   } else if (best_distance == 0) {
     cerr << "The program " << command << " is not installed. Install it by executing:" << endl;
     for (map <string, info>::iterator it=package_map.begin(); it!=package_map.end(); ++it) {
-      cerr << " pkg install " << it->second.owner;
+      cerr << " pkg install " << it->first;
       if (it->second.repository != "") {
         cerr << ", after subscribing to the " << it->second.repository << "-repo repository" << endl;
       } else {
@@ -235,7 +235,7 @@ int main(int argc, const char *argv[]) {
   } else {
     cerr << "No command " << command << " found, did you mean:" << endl;
     for (map <string, info>::iterator it=package_map.begin(); it!=package_map.end(); ++it) {
-      cerr << " Command " << it->first << " in package " << it->second.owner;
+      cerr << " Command " << it->second.binary << " in package " << it->first;
       if (!(it->second.repository == "")) {
         cerr << " from the " << it->second.repository << "-repo repository" << endl;
       } else {
