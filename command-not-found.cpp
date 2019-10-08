@@ -92,7 +92,7 @@ list<string> x11_commands = {
 struct info {string owner, repository;};
 
 inline int termux_min3(int a, int b, int c) {
-	return (a < b ? (a < c ? a : c) : (b < c ? b : c));
+  return (a < b ? (a < c ? a : c) : (b < c ? b : c));
 }
 
 int termux_levenshtein_distance(char const* s1, char const* s2) {
@@ -102,18 +102,20 @@ int termux_levenshtein_distance(char const* s1, char const* s2) {
   int **matrix;
   int distance;
   matrix = (int **) malloc(sizeof *matrix * (s2len+1));
-  if (matrix) {
-    matrix[0] = (int *) malloc(sizeof *matrix[0] * (s1len+1));
-  } else {
+
+  if (!matrix) {
     cerr << "Memory allocation seem to have failed" << endl;
     return -2;
   }
-  if (matrix[0]) {
-    matrix[0][0] = 0;
-  } else {
+
+  matrix[0] = (int *) malloc(sizeof *matrix[0] * (s1len+1));
+
+  if (!matrix[0]) {
     cerr << "Memory allocation seem to have failed" << endl;
     return -3;
   }
+
+  matrix[0][0] = 0;
   for (x = 1; x <= s2len; x++) {
     matrix[x] = (int *) malloc(sizeof *matrix[x] * (s1len+1));
 
@@ -149,8 +151,7 @@ int termux_look_for_packages(const char* command_not_found, list<string>* cmds, 
   map<string, info>* pkg_map = (map<string, info>*) guesses_at_best_distance;
   for (list<string>::iterator it = (*cmds).begin(); it != (*cmds).end(); ++it) {
     string current_line = *it;
-    if (current_line[0] != ' ')
-    {
+    if (current_line[0] != ' ') {
       current_package = current_line;
     } else {
       current_binary = current_line.substr(1);
