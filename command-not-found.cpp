@@ -5,28 +5,85 @@
 
 using namespace std;
 
-list<string> termux_commands = {
+list<string> games_commands = {
 #ifdef __aarch64__
-# include "commands-aarch64.h"
+# include "games/commands-aarch64.h"
 #elif defined __arm__
-# include "commands-arm.h"
-#elif defined __x86_64__
-# include "commands-x86_64.h"
+# include "games/commands-arm.h"
 #elif defined __i686__
-# include "commands-i686.h"
+# include "games/commands-i686.h"
+#elif defined __x86_64__
+# include "games/commands-x86_64.h"
 #else
 # error Failed to detect arch
 #endif
 };
+
+list<string> main_commands = {
+#ifdef __aarch64__
+# include "main/commands-aarch64.h"
+#elif defined __arm__
+# include "main/commands-arm.h"
+#elif defined __i686__
+# include "main/commands-i686.h"
+#elif defined __x86_64__
+# include "main/commands-x86_64.h"
+#else
+# error Failed to detect arch
+#endif
+};
+
 list<string> root_commands = {
 #ifdef __aarch64__
-# include "root-commands-aarch64.h"
+# include "root/commands-aarch64.h"
 #elif defined __arm__
-# include "root-commands-arm.h"
-#elif defined __x86_64__
-# include "root-commands-x86_64.h"
+# include "root/commands-arm.h"
 #elif defined __i686__
-# include "root-commands-i686.h"
+# include "root/commands-i686.h"
+#elif defined __x86_64__
+# include "root/commands-x86_64.h"
+#else
+# error Failed to detect arch
+#endif
+};
+
+list<string> science_commands = {
+#ifdef __aarch64__
+# include "science/commands-aarch64.h"
+#elif defined __arm__
+# include "science/commands-arm.h"
+#elif defined __i686__
+# include "science/commands-i686.h"
+#elif defined __x86_64__
+# include "science/commands-x86_64.h"
+#else
+# error Failed to detect arch
+#endif
+};
+
+list<string> unstable_commands = {
+#ifdef __aarch64__
+# include "unstable/commands-aarch64.h"
+#elif defined __arm__
+# include "unstable/commands-arm.h"
+#elif defined __i686__
+# include "unstable/commands-i686.h"
+#elif defined __x86_64__
+# include "unstable/commands-x86_64.h"
+#else
+# error Failed to detect arch
+#endif
+};
+
+list<string> x11_commands = {
+#ifdef __aarch64__
+# include "x11/commands-aarch64.h"
+#elif defined __arm__
+# include "x11/commands-arm.h"
+#elif defined __i686__
+# include "x11/commands-i686.h"
+#elif defined __x86_64__
+# include "x11/commands-x86_64.h"
 #else
 # error Failed to detect arch
 #endif
@@ -119,9 +176,13 @@ int main(int argc, const char *argv[]) {
   int best_distance = -1;
   struct info {string owner, repository;};
   map <string, info> package_map;
-  termux_look_for_packages(command, &termux_commands, &best_distance, &package_map, "");
+  termux_look_for_packages(command, &main_commands, &best_distance, &package_map, "");
+  termux_look_for_packages(command, &games_commands, &best_distance, &package_map, "game");
   termux_look_for_packages(command, &root_commands, &best_distance, &package_map, "root");
-  
+  termux_look_for_packages(command, &science_commands, &best_distance, &package_map, "science");
+  termux_look_for_packages(command, &unstable_commands, &best_distance, &package_map, "unstable");
+  termux_look_for_packages(command, &x11_commands, &best_distance, &package_map, "x11");
+
   if (best_distance == -1 || best_distance > 3) {
     cerr << command << ": command not found" << endl;
   } else if (best_distance == 0) {
