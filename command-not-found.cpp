@@ -156,16 +156,17 @@ int termux_look_for_packages(const char* command_not_found, list<string>* cmds, 
     } else {
       current_binary = current_line.substr(1);
       distance = termux_levenshtein_distance(command_not_found, current_binary.c_str());
-      if (*best_distance == distance) {
+      if (distance < -1) {
+        // malloc failed, return the error code
+        return -distance;
+      } else if (*best_distance == distance) {
         // As good as our previously best match
         (*pkg_map).insert(pair<string,info>(current_binary, {current_package, repository}));
-      } else if (*best_distance == -1 || *best_distance > distance) {
+      } else if (*best_distance == -1 || distance < *best_distance) {
         // New best match
         (*pkg_map).clear();
         *best_distance = distance;
         (*pkg_map).insert(pair<string,info>(current_binary, {current_package, repository}));
-      } else if (distance < -1) {
-        return distance;
       }
     }
   }
@@ -182,12 +183,25 @@ int main(int argc, const char *argv[]) {
   int best_distance = -1;
   struct info {string owner, repository;};
   map <string, info> package_map;
-  termux_look_for_packages(command, &main_commands, &best_distance, &package_map, "");
-  termux_look_for_packages(command, &games_commands, &best_distance, &package_map, "game");
-  termux_look_for_packages(command, &root_commands, &best_distance, &package_map, "root");
-  termux_look_for_packages(command, &science_commands, &best_distance, &package_map, "science");
-  termux_look_for_packages(command, &unstable_commands, &best_distance, &package_map, "unstable");
-  termux_look_for_packages(command, &x11_commands, &best_distance, &package_map, "x11");
+  int res;
+
+  res = termux_look_for_packages(command, &main_commands, &best_distance, &package_map, "");
+  if (res != 0) { return res; }
+
+  res = termux_look_for_packages(command, &games_commands, &best_distance, &package_map, "game");
+  if (res != 0) { return res; }
+
+  res = termux_look_for_packages(command, &root_commands, &best_distance, &package_map, "root");
+  if (res != 0) { return res; }
+
+  res = termux_look_for_packages(command, &science_commands, &best_distance, &package_map, "science");
+  if (res != 0) { return res; }
+
+  res = termux_look_for_packages(command, &unstable_commands, &best_distance, &package_map, "unstable");
+  if (res != 0) { return res; }
+
+  res = termux_look_for_packages(command, &x11_commands, &best_distance, &package_map, "x11");
+  if (res != 0) { return res; }
 
   if (best_distance == -1 || best_distance > 3) {
     cerr << command << ": command not found" << endl;
