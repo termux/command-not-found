@@ -16,6 +16,11 @@
 #include <cstring>
 #include <map>
 #include <list>
+#include <sys/stat.h>
+
+#ifndef PREFIX
+# define PREFIX "/data/data/com.termux/files/usr"
+#endif
 
 using namespace std;
 
@@ -104,6 +109,12 @@ list<string> x11_commands = {
 };
 
 struct info {string binary, repository;};
+
+/* https://stackoverflow.com/a/12774387 */
+inline bool file_exists (const string& name) {
+  struct stat buffer;
+  return (stat (name.c_str(), &buffer) == 0);
+}
 
 inline int termux_min3(int a, int b, int c) {
   return (a < b ? (a < c ? a : c) : (b < c ? b : c));
@@ -223,8 +234,9 @@ int main(int argc, const char *argv[]) {
     cerr << "The program " << command << " is not installed. Install it by executing:" << endl;
     for (map <string, info>::iterator it=package_map.begin(); it!=package_map.end(); ++it) {
       cerr << " pkg install " << it->first;
-      if (it->second.repository != "") {
-        cerr << ", after subscribing to the " << it->second.repository << "-repo repository" << endl;
+      if (it->second.repository != "" &&
+          !file_exists(PREFIX + it->second.repository + ".list")) {
+        cerr << ", after running pkg in " << it->second.repository << "-repo" << endl;
       } else {
         cerr << endl;
       }
@@ -236,7 +248,8 @@ int main(int argc, const char *argv[]) {
     cerr << "No command " << command << " found, did you mean:" << endl;
     for (map <string, info>::iterator it=package_map.begin(); it!=package_map.end(); ++it) {
       cerr << " Command " << it->second.binary << " in package " << it->first;
-      if (!(it->second.repository == "")) {
+      if (it->second.repository != "" &&
+          !file_exists(PREFIX + it->second.repository + ".list")) {
         cerr << " from the " << it->second.repository << "-repo repository" << endl;
       } else {
         cerr << endl;
