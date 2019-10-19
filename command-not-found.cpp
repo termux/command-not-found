@@ -208,6 +208,7 @@ int main(int argc, const char *argv[]) {
   int best_distance = -1;
   struct info {string binary, repository;};
   map <string, info> package_map;
+  map <string, info>::iterator it;
   int res;
 
   res = termux_look_for_packages(command, &main_commands, &best_distance, &package_map, "");
@@ -232,7 +233,7 @@ int main(int argc, const char *argv[]) {
     cerr << command << ": command not found" << endl;
   } else if (best_distance == 0) {
     cerr << "The program " << command << " is not installed. Install it by executing:" << endl;
-    for (map <string, info>::iterator it=package_map.begin(); it!=package_map.end(); ++it) {
+    for (it=package_map.begin(); it!=package_map.end(); ++it) {
       cerr << " pkg install " << it->first;
       if (it->second.repository != "" &&
           !file_exists(PREFIX + it->second.repository + ".list")) {
@@ -246,7 +247,7 @@ int main(int argc, const char *argv[]) {
     }
   } else {
     cerr << "No command " << command << " found, did you mean:" << endl;
-    for (map <string, info>::iterator it=package_map.begin(); it!=package_map.end(); ++it) {
+    for (it=package_map.begin(); it!=package_map.end(); ++it) {
       cerr << " Command " << it->second.binary << " in package " << it->first;
       if (it->second.repository != "" &&
           !file_exists(PREFIX + it->second.repository + ".list")) {
