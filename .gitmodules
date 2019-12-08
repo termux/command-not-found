@@ -10,3 +10,6 @@
 [submodule "x11/x11-packages"]
 	path = x11/x11-packages
 	url = https://github.com/termux/x11-packages
+[submodule "science/science-packages"]
+	path = science/science-packages
+	url = https://github.com/termux/science-packages
