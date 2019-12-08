@@ -8,6 +8,8 @@
 " phear",
 "curseofwar",
 " curseofwar",
+"dopewars",
+" dopewars",
 "frotz",
 " zgames",
 " frotz",

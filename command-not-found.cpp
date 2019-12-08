@@ -80,34 +80,6 @@ list<string> science_commands = {
 #endif
 };
 
-list<string> unstable_commands = {
-#ifdef __aarch64__
-# include "unstable/commands-aarch64.h"
-#elif defined __arm__
-# include "unstable/commands-arm.h"
-#elif defined __i686__
-# include "unstable/commands-i686.h"
-#elif defined __x86_64__
-# include "unstable/commands-x86_64.h"
-#else
-# error Failed to detect arch
-#endif
-};
-
-list<string> x11_commands = {
-#ifdef __aarch64__
-# include "x11/commands-aarch64.h"
-#elif defined __arm__
-# include "x11/commands-arm.h"
-#elif defined __i686__
-# include "x11/commands-i686.h"
-#elif defined __x86_64__
-# include "x11/commands-x86_64.h"
-#else
-# error Failed to detect arch
-#endif
-};
-
 struct info {string binary, repository;};
 
 /* https://stackoverflow.com/a/12774387 */
@@ -221,12 +193,6 @@ int main(int argc, const char *argv[]) {
   if (res != 0) { return res; }
 
   res = termux_look_for_packages(command, &science_commands, &best_distance, &package_map, "science");
-  if (res != 0) { return res; }
-
-  res = termux_look_for_packages(command, &unstable_commands, &best_distance, &package_map, "unstable");
-  if (res != 0) { return res; }
-
-  res = termux_look_for_packages(command, &x11_commands, &best_distance, &package_map, "x11");
   if (res != 0) { return res; }
 
   if (best_distance == -1 || best_distance > 3) {
