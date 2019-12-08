@@ -1,0 +1,3 @@
+[submodule "root/termux-root-packages"]
+	path = root/termux-root-packages
+	url = https://github.com/termux/termux-root-packages
