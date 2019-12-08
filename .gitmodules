@@ -4,3 +4,6 @@
 [submodule "games/game-packages"]
 	path = games/game-packages
 	url = https://github.com/termux/game-packages
+[submodule "unstable/unstable-packages"]
+	path = unstable/unstable-packages
+	url = https://github.com/termux/unstable-packages
