@@ -13,3 +13,6 @@
 [submodule "science/science-packages"]
 	path = science/science-packages
 	url = https://github.com/termux/science-packages
+[submodule "main/termux-packages"]
+	path = main/termux-packages
+	url = https://github.com/termux/termux-packages
