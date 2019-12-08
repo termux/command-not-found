@@ -7,3 +7,6 @@
 [submodule "unstable/unstable-packages"]
 	path = unstable/unstable-packages
 	url = https://github.com/termux/unstable-packages
+[submodule "x11/x11-packages"]
+	path = x11/x11-packages
+	url = https://github.com/termux/x11-packages
