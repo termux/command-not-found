@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 
 shopt -s nullglob
+set -e
 
 if [ "$1" == "all" ]; then
     REPOS="termux-packages termux-root-packages science-packages game-packages unstable-packages x11-packages"
@@ -50,7 +51,7 @@ download_deb() {
                    ! file -i "${PKG_NAME}_${DEP_VERSION}_${DEP_ARCH}.deb" | grep "debian.binary-package" 1>/dev/null;
             then
                 echo "Downloading ${REPO_URL}/$DEP_ARCH/${PKG_NAME}_${DEP_VERSION}_${DEP_ARCH}.deb" 1>&2
-                curl -LO ${REPO_URL}/$DEP_ARCH/${PKG_NAME}_${DEP_VERSION}_${DEP_ARCH}.deb
+                curl --fail -LO ${REPO_URL}/$DEP_ARCH/${PKG_NAME}_${DEP_VERSION}_${DEP_ARCH}.deb || exit 1
             else
                 printf "%-50s %s\n" "${PKG_NAME}_${DEP_VERSION}_${DEP_ARCH}.deb" "already downloaded" 1>&2
             fi
