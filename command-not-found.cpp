@@ -200,7 +200,7 @@ int termux_look_for_packages(const char* command_not_found, list<string>* cmds, 
 
 int main(int argc, const char *argv[]) {
   if (argc != 2) {
-    cerr <<  "usage: termux-command-not-found <command>" << endl;
+    cerr <<  "usage: command-not-found <command>" << endl;
     return 1;
   }
 
