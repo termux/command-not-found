@@ -251,6 +251,8 @@
 "racket",
 " racket",
 " raco",
+"rustc-nightly",
+" llvm-confige",
 "setoolkit",
 " seautomate",
 " seproxy",
