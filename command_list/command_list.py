@@ -35,9 +35,9 @@ class command_list(object):
         all_content = [full_string.split()[5] for full_string in
                        subprocess.run(["dpkg", '-c', deb_path], capture_output = True)
                        .stdout.decode("utf-8").split("\n")[:-1]]
-        binaries = [bin.split("/bin/")[-1] for bin in all_content
+        binaries = [bin.replace("./data/data/com.termux/files/usr/bin/", "").replace("applets/", "") for bin in all_content
                     if bin.startswith("./data/data/com.termux/files/usr/bin/")
-                    and bin.split("/bin/")[-1]]
+                    and bin.replace("./data/data/com.termux/files/usr/bin/", "").replace("applets/", "")]
         return binaries
 
     def add_package_to_list(self, package, binaries):
