@@ -91,7 +91,9 @@ for REPO in $REPOS; do
                              |awk -F"-" '{ print substr($3,1,7) }')
 
         # Get new commit (current checked out commit of submodule)
-        NEW_COMMIT=$(git submodule status $REPO | awk '{ print substr($1,2,7) }')
+        NEW_COMMIT=$(git submodule status $REPO \
+                         |awk '{ if ($1 ~ /^+/) {print substr($1,2,7)} else {print substr($1,1,7)} }')
+        if [ "$CURRENT_COMMIT" == "$NEW_COMMIT" ]; then continue; fi
 
         UPDATED_PACKAGES=$(cd $REPO/$REPO;
                            git diff --dirstat=files,0 \
