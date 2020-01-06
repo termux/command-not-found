@@ -43,6 +43,11 @@ download_deb() {
         # though so this error is not blocking. stderr is redirected to /dev/null below until a nicer
         # workaround can be found.
         read DEP_ARCH DEP_VERSION <<< $(termux_extract_dep_info $PKG_NAME "${PKG_DIR}" 2>/dev/null)
+        if [ -z "$DEP_ARCH" ]; then
+            # termux_extract_dep_info returned nothing so the package is
+            # probably blacklisted for the current arch
+            return
+        fi
         (
             cd "$TERMUX_TOPDIR/_cache-${DEP_ARCH}"
             # file -i <deb> | grep "debian.binary-package" ensures that the file is a deb file,
