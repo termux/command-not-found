@@ -107,7 +107,7 @@ for REPO in $REPOS; do
         DEBS=""
         DELETED_PACKAGES=""
         for PACKAGE in ${UPDATED_PACKAGES}; do
-            if [ -d $REPO/$REPO/$PACKAGE ]; then
+            if [ -d $REPO/$REPO/$PACKAGE ] && ! grep -q $ARCH < <(grep "^TERMUX_PKG_BLACKLISTED_ARCHES=" $REPO/$REPO/$PACKAGE/build.sh); then
                 DEBS+="$(download_deb $(basename $PACKAGE) $PACKAGE $ARCH)"
             else
                 # Package seem to have been deleted,
