@@ -26,13 +26,13 @@ using namespace std;
 
 list<string> games_commands = {
 #ifdef __aarch64__
-# include "game-packages/commands-aarch64-be11520.h"
+# include "game-packages/commands-aarch64-74c021d.h"
 #elif defined __arm__
-# include "game-packages/commands-arm-be11520.h"
+# include "game-packages/commands-arm-74c021d.h"
 #elif defined __i686__
-# include "game-packages/commands-i686-be11520.h"
+# include "game-packages/commands-i686-74c021d.h"
 #elif defined __x86_64__
-# include "game-packages/commands-x86_64-be11520.h"
+# include "game-packages/commands-x86_64-74c021d.h"
 #else
 # error Failed to detect arch
 #endif
@@ -40,13 +40,13 @@ list<string> games_commands = {
 
 list<string> main_commands = {
 #ifdef __aarch64__
-# include "termux-packages/commands-aarch64-1f4fd24.h"
+# include "termux-packages/commands-aarch64-a4a2b64.h"
 #elif defined __arm__
-# include "termux-packages/commands-arm-1f4fd24.h"
+# include "termux-packages/commands-arm-a4a2b64.h"
 #elif defined __i686__
-# include "termux-packages/commands-i686-1f4fd24.h"
+# include "termux-packages/commands-i686-a4a2b64.h"
 #elif defined __x86_64__
-# include "termux-packages/commands-x86_64-1f4fd24.h"
+# include "termux-packages/commands-x86_64-a4a2b64.h"
 #else
 # error Failed to detect arch
 #endif
@@ -54,13 +54,13 @@ list<string> main_commands = {
 
 list<string> root_commands = {
 #ifdef __aarch64__
-# include "termux-root-packages/commands-aarch64-b39ad9e.h"
+# include "termux-root-packages/commands-aarch64-0ea305a.h"
 #elif defined __arm__
-# include "termux-root-packages/commands-arm-b39ad9e.h"
+# include "termux-root-packages/commands-arm-0ea305a.h"
 #elif defined __i686__
-# include "termux-root-packages/commands-i686-b39ad9e.h"
+# include "termux-root-packages/commands-i686-0ea305a.h"
 #elif defined __x86_64__
-# include "termux-root-packages/commands-x86_64-b39ad9e.h"
+# include "termux-root-packages/commands-x86_64-0ea305a.h"
 #else
 # error Failed to detect arch
 #endif
@@ -68,13 +68,13 @@ list<string> root_commands = {
 
 list<string> science_commands = {
 #ifdef __aarch64__
-# include "science-packages/commands-aarch64-cd88049.h"
+# include "science-packages/commands-aarch64-19027d8.h"
 #elif defined __arm__
-# include "science-packages/commands-arm-cd88049.h"
+# include "science-packages/commands-arm-19027d8.h"
 #elif defined __i686__
-# include "science-packages/commands-i686-cd88049.h"
+# include "science-packages/commands-i686-19027d8.h"
 #elif defined __x86_64__
-# include "science-packages/commands-x86_64-cd88049.h"
+# include "science-packages/commands-x86_64-19027d8.h"
 #else
 # error Failed to detect arch
 #endif
@@ -82,13 +82,13 @@ list<string> science_commands = {
 
 list<string> unstable_commands = {
 #ifdef __aarch64__
-# include "unstable-packages/commands-aarch64-47aa7b0.h"
+# include "unstable-packages/commands-aarch64-478d0d4.h"
 #elif defined __arm__
-# include "unstable-packages/commands-arm-47aa7b0.h"
+# include "unstable-packages/commands-arm-478d0d4.h"
 #elif defined __i686__
-# include "unstable-packages/commands-i686-47aa7b0.h"
+# include "unstable-packages/commands-i686-478d0d4.h"
 #elif defined __x86_64__
-# include "unstable-packages/commands-x86_64-47aa7b0.h"
+# include "unstable-packages/commands-x86_64-478d0d4.h"
 #else
 # error Failed to detect arch
 #endif
@@ -96,13 +96,13 @@ list<string> unstable_commands = {
 
 list<string> x11_commands = {
 #ifdef __aarch64__
-# include "x11-packages/commands-aarch64-2ae4b02.h"
+# include "x11-packages/commands-aarch64-b80dc5c.h"
 #elif defined __arm__
-# include "x11-packages/commands-arm-2ae4b02.h"
+# include "x11-packages/commands-arm-b80dc5c.h"
 #elif defined __i686__
-# include "x11-packages/commands-i686-2ae4b02.h"
+# include "x11-packages/commands-i686-b80dc5c.h"
 #elif defined __x86_64__
-# include "x11-packages/commands-x86_64-2ae4b02.h"
+# include "x11-packages/commands-x86_64-b80dc5c.h"
 #else
 # error Failed to detect arch
 #endif

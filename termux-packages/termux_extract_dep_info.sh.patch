@@ -1,0 +1,25 @@
+commit 496b4cd09eee670ade9915debf90f7238936e1da
+Author: Henrik Grimler <henrik@grimler.se>
+Date:   Mon Jan 6 11:48:13 2020 +0100
+
+    termux_extract_dep_info: don't echo if arch is blacklisted
+    
+    To fix problem with command-not-found update scripts
+
+diff --git a/scripts/build/termux_extract_dep_info.sh b/scripts/build/termux_extract_dep_info.sh
+index e5c889324..9cf43eadc 100755
+--- a/scripts/build/termux_extract_dep_info.sh
++++ b/scripts/build/termux_extract_dep_info.sh
+@@ -33,7 +33,11 @@ termux_extract_dep_info() {
+ 		if [ "$TERMUX_PKG_REVISION" != "0" ] || [ "$TERMUX_PKG_VERSION" != "${TERMUX_PKG_VERSION/-/}" ]; then
+ 			TERMUX_PKG_VERSION+="-$TERMUX_PKG_REVISION"
+ 		fi
+-		echo ${TERMUX_ARCH} ${TERMUX_PKG_VERSION}
++		# Check so that current arch isn't blacklisted. Should never happen
++                # except when running this script from command-not-found update scripts
++		if [[ $TERMUX_PKG_BLACKLISTED_ARCHES != *$TERMUX_ARCH* ]]; then
++			echo ${TERMUX_ARCH} ${TERMUX_PKG_VERSION}
++		fi
+ 	)
+ }
+ 

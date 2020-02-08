@@ -19,6 +19,8 @@
 "atomvm",
 " AtomVM",
 " PackBEAM",
+"bftpd",
+" bftpd",
 "ccls",
 " ccls",
 "cppcheck",
