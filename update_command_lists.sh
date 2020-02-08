@@ -103,7 +103,7 @@ for REPO in $REPOS; do
         UPDATED_PACKAGES=$(cd $REPO/$REPO;
                            git diff --dirstat=files,0 \
                                ${CURRENT_COMMIT}..${NEW_COMMIT} \
-                               -- packages|awk '{print $2}')
+                               -- packages|awk '{if (gsub(/\//, "/") == 2) print $2}')
         DEBS=""
         DELETED_PACKAGES=""
         for PACKAGE in ${UPDATED_PACKAGES}; do
