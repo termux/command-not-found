@@ -9,6 +9,8 @@ else
     REPOS="$1"
 fi
 
+: ${TMPDIR:=/tmp}
+
 download_deb() {
     # This function sources a package's build.sh, and possible *.subpackage.sh,
     # and downloads the debs from a given repo. Debs are saved in $TERMUX_TOPDIR/_cache-$ARCH,
@@ -50,13 +52,12 @@ download_deb() {
         fi
         (
             cd "$TERMUX_TOPDIR/_cache-${DEP_ARCH}"
-            # file -i <deb> | grep "debian.binary-package" ensures that the file is a deb file,
-            # and not a partial download
-            if [ ! -f "${PKG_NAME}_${DEP_VERSION}_${DEP_ARCH}.deb" ] ||
-                   ! file -i "${PKG_NAME}_${DEP_VERSION}_${DEP_ARCH}.deb" | grep "debian.binary-package" 1>/dev/null;
+            if [ ! -f "${PKG_NAME}_${DEP_VERSION}_${DEP_ARCH}.deb" ];
             then
                 echo "Downloading ${REPO_URL}/$DEP_ARCH/${PKG_NAME}_${DEP_VERSION}_${DEP_ARCH}.deb" 1>&2
-                curl --fail -LO ${REPO_URL}/$DEP_ARCH/${PKG_NAME}_${DEP_VERSION}_${DEP_ARCH}.deb || exit 1
+                TEMP_DEB=$(mktemp $TMPDIR/${PKG_NAME}_${DEP_VERSION}_${DEP_ARCH}.deb.XXXXXX)
+                curl --fail -L -o "${TEMP_DEB}" "${REPO_URL}/$DEP_ARCH/${PKG_NAME}_${DEP_VERSION}_${DEP_ARCH}.deb" || exit 1
+                mv ${TEMP_DEB} ${PKG_NAME}_${DEP_VERSION}_${DEP_ARCH}.deb
             else
                 printf "%-50s %s\n" "${PKG_NAME}_${DEP_VERSION}_${DEP_ARCH}.deb" "already downloaded" 1>&2
             fi
