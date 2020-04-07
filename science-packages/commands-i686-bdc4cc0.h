@@ -143,3 +143,4 @@
 " gie",
 " proj",
 " projinfo",
+" projsync",
