@@ -237,6 +237,7 @@
 "qemu-system-riscv64",
 " qemu-system-riscv64",
 "qemu-system-x86",
+" qemu-keymap",
 " qemu-system-x86_64",
 "qemu-system-x86_64",
 " qemu-system-x86_64",
