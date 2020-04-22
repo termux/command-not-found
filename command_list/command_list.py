@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import subprocess
+import subprocess, os
 
 class command_list(object):
     def __init__(self, command_list_file):
@@ -35,9 +35,9 @@ class command_list(object):
         all_content = [full_string.split()[5] for full_string in
                        subprocess.run(["dpkg", '-c', deb_path], capture_output = True)
                        .stdout.decode("utf-8").split("\n")[:-1]]
-        binaries = [bin.replace("./data/data/com.termux/files/usr/bin/", "").replace("applets/", "") for bin in all_content
+        binaries = [os.path.basename(bin.replace("./data/data/com.termux/files/usr/bin/", "")) for bin in all_content
                     if bin.startswith("./data/data/com.termux/files/usr/bin/")
-                    and bin.replace("./data/data/com.termux/files/usr/bin/", "").replace("applets/", "")]
+                    and os.path.basename(bin.replace("./data/data/com.termux/files/usr/bin/", ""))]
         return binaries
 
     def add_package_to_list(self, package, binaries):
