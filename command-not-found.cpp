@@ -210,6 +210,7 @@ int main(int argc, const char *argv[]) {
   map <string, info> package_map;
   map <string, info>::iterator it;
   int res;
+  string sources_prefix = string(PREFIX) + "/etc/apt/sources.list.d/";
 
   res = termux_look_for_packages(command, &main_commands, &best_distance, &package_map, "");
   if (res != 0) { return res; }
@@ -236,7 +237,7 @@ int main(int argc, const char *argv[]) {
     for (it=package_map.begin(); it!=package_map.end(); ++it) {
       cerr << " pkg install " << it->first;
       if (it->second.repository != "" &&
-          !file_exists(PREFIX + it->second.repository + ".list")) {
+          !file_exists(sources_prefix + it->second.repository + ".list")) {
         cerr << ", after running pkg in " << it->second.repository << "-repo" << endl;
       } else {
         cerr << endl;
@@ -250,7 +251,7 @@ int main(int argc, const char *argv[]) {
     for (it=package_map.begin(); it!=package_map.end(); ++it) {
       cerr << " Command " << it->second.binary << " in package " << it->first;
       if (it->second.repository != "" &&
-          !file_exists(PREFIX + it->second.repository + ".list")) {
+          !file_exists(sources_prefix + it->second.repository + ".list")) {
         cerr << " from the " << it->second.repository << "-repo repository" << endl;
       } else {
         cerr << endl;
