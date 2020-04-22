@@ -17,6 +17,7 @@ if len(sys.argv) > 3:
         packages_to_delete = sys.argv[4:]
     else:
         print("Error: unknown argument '" + sys.argv[3] + "'")
+        sys.exit(1)
 else:
     packages_to_delete = ""
 
