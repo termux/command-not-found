@@ -21,11 +21,11 @@ if len(sys.argv) > 3:
 else:
     packages_to_delete = ""
 
-list = command_list(command_list_path)
-list.read_list()
+list_of_commands = command_list(command_list_path)
+list_of_commands.read_list()
 
 for package in packages_to_delete:
-    list.remove_package_from_list(package.replace("packages/", "").strip("/"))
+    list_of_commands.remove_package_from_list(package.replace("packages/", "").strip("/"))
 
 # Read from stdin, strip away newlines and empty lines.
 # Packages are read from stdin instead of giving as arguments as we otherwise
@@ -33,11 +33,11 @@ for package in packages_to_delete:
 for package in [pkg.strip('\n') for pkg in sys.stdin if pkg.strip('\n')]:
     package_name = package.split("/")[-1].split("_")[0]
     print("Parsing " + package_name)
-    binaries = list.get_list_from_deb(package)
+    binaries = list_of_commands.get_list_from_deb(package)
 
     if binaries:
-        if list.package_exists_in_list(package_name):
-            list.remove_package_from_list(package_name)
-        list.add_package_to_list(package_name, binaries)
+        if list_of_commands.package_exists_in_list(package_name):
+            list_of_commands.remove_package_from_list(package_name)
+        list_of_commands.add_package_to_list(package_name, binaries)
 
-list.write_list(new_commit)
+list_of_commands.write_list(new_commit)
