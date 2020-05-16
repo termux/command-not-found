@@ -31,13 +31,14 @@ class command_list(object):
                     f.write('" '+binary+'",\n')
 
     def get_list_from_deb(self, deb_path):
-        """ Get list of binaries inside deb"""
+        """ Get list of binaries inside deb """
         all_content = [full_string.split()[5] for full_string in
                        subprocess.run(["dpkg", '-c', deb_path], capture_output = True)
                        .stdout.decode("utf-8").split("\n")[:-1]]
-        binaries = [os.path.basename(bin.replace("./data/data/com.termux/files/usr/bin/", "")) for bin in all_content
-                    if bin.startswith("./data/data/com.termux/files/usr/bin/")
-                    and os.path.basename(bin.replace("./data/data/com.termux/files/usr/bin/", ""))]
+        binaries = [os.path.basename(b.replace("./data/data/com.termux/files/usr/bin/", "")) for b in all_content
+                    if b.startswith("./data/data/com.termux/files/usr/bin/")
+                    and os.path.basename(b.replace("./data/data/com.termux/files/usr/bin/", ""))]
+        return binaries
         return binaries
 
     def add_package_to_list(self, package, binaries):
