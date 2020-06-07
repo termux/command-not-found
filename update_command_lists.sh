@@ -51,6 +51,7 @@ download_deb() {
             return
         fi
         (
+            mkdir -p "$TERMUX_TOPDIR/_cache-${DEP_ARCH}"
             cd "$TERMUX_TOPDIR/_cache-${DEP_ARCH}"
             if [ ! -f "${PKG_NAME}_${DEP_VERSION}_${DEP_ARCH}.deb" ];
             then
