@@ -53,6 +53,8 @@
 " hping",
 " hping2",
 " hping3",
+"htop",
+" htop",
 "hw-probe",
 " hw-probe",
 "hwinfo",

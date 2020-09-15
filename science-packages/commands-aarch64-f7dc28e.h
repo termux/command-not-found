@@ -30,6 +30,8 @@
 " ogrlineref",
 " ogrtindex",
 " testepsg",
+"glpk",
+" glpsol",
 "gnucap",
 " gnucap",
 " gnucap-conf",

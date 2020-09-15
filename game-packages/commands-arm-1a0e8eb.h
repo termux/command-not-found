@@ -49,6 +49,8 @@
 "pacman4console",
 " pacman",
 " pacmanedit",
+"snake",
+" snake",
 "tty-solitaire",
 " ttysolitaire",
 "vitetris",
