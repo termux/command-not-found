@@ -1,3 +1,7 @@
+"cgal",
+" cgal_create_CMakeLists",
+" cgal_create_cmake_script",
+" cgal_make_macosx_app",
 "gap",
 " gac",
 " gap",

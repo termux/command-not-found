@@ -61,7 +61,7 @@
 " update-distcc-symlinks",
 "electrum",
 " electrum",
-" qdarkstyle",
+" helpdev",
 "enscript",
 " diffpp",
 " enscript",
