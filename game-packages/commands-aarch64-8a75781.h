@@ -10,6 +10,8 @@
 " cboard",
 "curseofwar",
 " curseofwar",
+"dmagnetic",
+" dMagnetic",
 "dopewars",
 " dopewars",
 "frotz",
