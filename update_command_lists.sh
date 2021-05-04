@@ -11,22 +11,24 @@ fi
 
 : "${TMPDIR:=/tmp}"
 
+# TERMUX_TOPDIR is defined in termux_step_setup_variables
+source ./termux-packages/termux-packages/scripts/build/termux_step_setup_variables.sh
+source ./termux-packages/termux-packages/scripts/build/termux_extract_dep_info.sh
+export TERMUX_SCRIPTDIR=./termux-packages/termux-packages
+source $TERMUX_SCRIPTDIR/scripts/properties.sh
+termux_step_setup_variables
+
 download_deb() {
     # This function sources a package's build.sh, and possible *.subpackage.sh,
     # and downloads the debs from a given repo. Debs are saved in $TERMUX_TOPDIR/_cache-$ARCH,
     # which is the same directory as when doing ./build-package.sh -i <pkg> builds
     pkg=$1
     pkg_dir=$2
-    TERMUX_ARCH=$3
+    deb_paths="$3"
+    TERMUX_ARCH=$4
 
-    # TERMUX_TOPDIR is defined in termux_step_setup_variables
-    source ./termux-packages/termux-packages/scripts/build/termux_step_setup_variables.sh
-    source ./termux-packages/termux-packages/scripts/build/termux_extract_dep_info.sh
-    export TERMUX_SCRIPTDIR=./termux-packages/termux-packages
-    source $TERMUX_SCRIPTDIR/scripts/properties.sh
-    termux_step_setup_variables
     cd $repo/$repo
-    export TERMUX_SCRIPTDIR=.
+    TERMUX_SCRIPTDIR=.
 
     for build_file in ${pkg_dir}/build.sh ${pkg_dir}*.subpackage.sh; do
         if [ "$(basename $build_file)" == "build.sh" ]; then
@@ -46,23 +48,34 @@ download_deb() {
         # workaround can be found.
         read dep_arch dep_version <<< $(termux_extract_dep_info $pkg_name "${pkg_dir}" 2>/dev/null)
         if [ -z "$dep_arch" ]; then
-            # termux_extract_dep_info returned nothing so the package is
-            # probably blacklisted for the current arch
+            # termux_extract_dep_info returned nothing so the package
+            # is probably blacklisted for the current arch
             return
         fi
-        (
-            mkdir -p "$TERMUX_TOPDIR/_cache-${dep_arch}"
-            cd "$TERMUX_TOPDIR/_cache-${dep_arch}"
-            if [ ! -f "${pkg_name}_${dep_version}_${dep_arch}.deb" ];
-            then
-                echo "Downloading ${repo_url}/$dep_arch/${pkg_name}_${dep_version}_${dep_arch}.deb" 1>&2
-                temp_deb=$(mktemp $TMPDIR/${pkg_name}_${dep_version}_${dep_arch}.deb.XXXXXX)
-                curl --fail -L -o "${temp_deb}" "${repo_url}/$dep_arch/${pkg_name}_${dep_version}_${dep_arch}.deb" || exit 1
-                mv ${temp_deb} ${pkg_name}_${dep_version}_${dep_arch}.deb
-            else
-                printf "%-50s %s\n" "${pkg_name}_${dep_version}_${dep_arch}.deb" "already downloaded" 1>&2
+
+        # Check for correct entry in $deb_paths with correct version
+        # in case several entries were found.
+        for path in $deb_paths; do
+            if [ "$(basename $path)" == "${pkg_name}_${dep_version}_${dep_arch}.deb" ]; then
+                deb_path=$path
             fi
-            echo "$TERMUX_TOPDIR/_cache-${dep_arch}/${pkg_name}_${dep_version}_${dep_arch}.deb\n"
+        done
+        if [ -z "$deb_path" ]; then
+            echo "${pkg_name}_${dep_version}_${dep_arch}.deb not found in ${deb_paths}" 1>&2
+            return
+        fi
+
+        (
+            cd "$TERMUX_TOPDIR/_cache-${dep_arch}"
+            if [ ! -f "${pkg_name}_${dep_version}_${dep_arch}.deb" ]; then
+                echo "Downloading ${repo_url}/${deb_path}" 1>&2
+                temp_deb=$(mktemp $TMPDIR/$(basename ${deb_path}).XXXXXX)
+                curl --fail -L -o "${temp_deb}" "${repo_url}/${deb_path}" || exit 1
+                mv ${temp_deb} $(basename ${deb_path})
+            else
+                printf "%-50s %s\n" "$(basename ${deb_path})" "already downloaded" 1>&2
+            fi
+            echo "$TERMUX_TOPDIR/_cache-${dep_arch}/$(basename ${deb_path})\n"
         )
     done
 }
@@ -71,21 +84,33 @@ for repo in $repos; do
     case $repo in
         termux-packages)
             repo_url="https://grimler.se/$repo-24"
+            distribution="stable"
+            component="main"
             ;;
         termux-root-packages)
             repo_url="https://grimler.se/$repo-24"
+            distribution="root"
+            component="stable"
             ;;
         science-packages)
             repo_url="https://grimler.se/$repo-24"
+            distribution="science"
+            component="stable"
             ;;
         game-packages)
             repo_url="https://grimler.se/$repo-24"
+            distribution="games"
+            component="stable"
             ;;
         unstable-packages)
             repo_url="https://grimler.se/$repo"
+            distribution="unstable"
+            component="main"
             ;;
         x11-packages)
             repo_url="https://grimler.se/$repo"
+            distribution="x11"
+            component="main"
             ;;
         *)
             echo "Unknown repo: '$repo'"
@@ -106,11 +131,26 @@ for repo in $repos; do
                            git diff --dirstat=files,0 \
                                ${current_commit}..${new_commit} \
                                -- packages|awk '{if (gsub(/\//, "/") == 2) print $2}')
+
+        mkdir -p "$TERMUX_TOPDIR/_cache-${arch}"
+        # Let's get Packages file for $arch so that we can parse it to get
+        # path on repo to the deb we want to download.
+        temp_packages=$(mktemp $TMPDIR/Packages_$arch.XXXXXX)
+        curl --silent --fail -L -o "${temp_packages}" "${repo_url}/dists/$distribution/$component/binary-$arch/Packages"
+        packages_file="$(echo ${repo_url}|sed "s@/@-@g")-$distribution-$component-binary-$arch-Packages"
+        mv ${temp_packages} "$packages_file"
+
         debs=""
         deleted_packages=""
         for package in ${updated_packages}; do
             if [ -d $repo/$repo/$package ] && ! grep -q $arch < <(grep "^TERMUX_PKG_BLACKLISTED_ARCHES=" $repo/$repo/$package/build.sh); then
-                debs+="$(download_deb $(basename $package) $package $arch)"
+                # Get lines between "Package: $package" and the next empty
+                # line (marking start of next Package: entry).
+                deb_paths=$(sed -n "/Package: $(basename $package)/,/^$/p" \
+                        ${packages_file} | grep Filename | awk '{print $2}')
+                # Check for correct entry with correct version in case
+                # several entries were found.
+                debs+="$(download_deb $(basename $package) $package "${deb_paths}" $arch)"
             else
                 # Package seem to have been deleted,
                 # we need to delete it from the command list
