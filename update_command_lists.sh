@@ -70,22 +70,22 @@ download_deb() {
 for repo in $repos; do
     case $repo in
         termux-packages)
-            repo_url="https://dl.bintray.com/termux/$repo-24"
+            repo_url="https://grimler.se/$repo-24"
             ;;
         termux-root-packages)
-            repo_url="https://dl.bintray.com/grimler/$repo-24"
+            repo_url="https://grimler.se/$repo-24"
             ;;
         science-packages)
-            repo_url="https://dl.bintray.com/grimler/$repo-24"
+            repo_url="https://grimler.se/$repo-24"
             ;;
         game-packages)
-            repo_url="https://dl.bintray.com/grimler/$repo-24"
+            repo_url="https://grimler.se/$repo-24"
             ;;
         unstable-packages)
-            repo_url="https://dl.bintray.com/xeffyr/$repo"
+            repo_url="https://grimler.se/$repo"
             ;;
         x11-packages)
-            repo_url="https://dl.bintray.com/xeffyr/$repo"
+            repo_url="https://grimler.se/$repo"
             ;;
         *)
             echo "Unknown repo: '$repo'"
