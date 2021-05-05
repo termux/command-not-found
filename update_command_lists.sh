@@ -36,16 +36,15 @@ download_deb() {
         else
             pkg_name=$(basename ${build_file%%.*})
         fi
-        # Assume arch=TERMUX_ARCH unless TERMUX_{,SUB}PKG_PLATFORM_INDEPENDENT=true
-        export TERMUX_ARCH
+
         dep_arch=""
         dep_version=""
-
         # Some packages, like all of texlive's subpackages, gives an error when sourcing the build.sh.
         # This happens because texlive's subpackages use a script to get the file list, which fails due
         # to unset variables in this context. We are only interested in the arch, not the file list
         # though so this error is not blocking. stderr is redirected to /dev/null below until a nicer
         # workaround can be found.
+
         read dep_arch dep_version <<< $(termux_extract_dep_info $pkg_name "${pkg_dir}" 2>/dev/null)
         if [ -z "$dep_arch" ]; then
             # termux_extract_dep_info returned nothing so the package
@@ -65,7 +64,8 @@ download_deb() {
             if [ ! -f "${pkg_name}_${dep_version}_${dep_arch}.deb" ]; then
                 echo "Downloading ${repo_url}/${deb_path}" 1>&2
                 temp_deb=$(mktemp $TMPDIR/$(basename ${deb_path}).XXXXXX)
-                curl --fail -L -o "${temp_deb}" "${repo_url}/${deb_path}" || exit 1
+                curl --fail -L -o "${temp_deb}" "${repo_url}/${deb_path}" || \
+                    echo "Download of ${repo_url}/${deb_path} failed" 1>&2
                 mv ${temp_deb} $(basename ${deb_path})
             else
                 printf "%-50s %s\n" "$(basename ${deb_path})" "already downloaded" 1>&2
@@ -151,7 +151,8 @@ for repo in $repos; do
         # Let's get Packages file for $arch so that we can parse it to get
         # path on repo to the deb we want to download.
         temp_packages=$(mktemp $TMPDIR/Packages_$arch.XXXXXX)
-        curl --silent --fail -L -o "${temp_packages}" "${repo_url}/dists/$distribution/$component/binary-$arch/Packages"
+        curl --fail -L -o "${temp_packages}" "${repo_url}/dists/$distribution/$component/binary-$arch/Packages" || \
+            echo "Download of ${repo_url}/dists/$distribution/$component/binary-$arch/Packages failed" 1>&2 || exit 1
         packages_file="$TERMUX_TOPDIR/_cache-${arch}/$(echo ${repo_url}|sed -e "s@https://@@g" -e "s@/@-@g")-$distribution-$component-binary-$arch-Packages"
         mv ${temp_packages} "$packages_file"
 
