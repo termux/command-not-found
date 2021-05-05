@@ -98,7 +98,7 @@ get_deb_path() {
 for repo in $repos; do
     case $repo in
         termux-packages)
-            repo_url="https://grimler.se/$repo-24"
+            repo_url="https://termux.org/packages"
             distribution="stable"
             component="main"
             ;;
@@ -118,12 +118,12 @@ for repo in $repos; do
             component="stable"
             ;;
         unstable-packages)
-            repo_url="https://grimler.se/$repo"
+            repo_url="https://termux.com/$repo-bin"
             distribution="unstable"
             component="main"
             ;;
         x11-packages)
-            repo_url="https://grimler.se/$repo"
+            repo_url="https://termux.com/$repo-bin"
             distribution="x11"
             component="main"
             ;;
