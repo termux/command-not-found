@@ -25,6 +25,7 @@ list_of_commands = command_list(command_list_path)
 list_of_commands.read_list()
 
 for package in packages_to_delete:
+    print("Deleting " + package)
     list_of_commands.remove_package_from_list(package.replace("packages/", "").strip("/"))
 
 # Read from stdin, strip away newlines and empty lines.

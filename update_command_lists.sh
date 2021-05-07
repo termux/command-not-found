@@ -52,25 +52,24 @@ download_deb() {
             return
         fi
 
-        # Get path to the deb on the repo
-        deb_path=$(get_deb_path ${packages_file} $pkg_name $dep_version $dep_arch)
-        if [ -z "$deb_path" ]; then
-            echo "${pkg_name}_${dep_version}_${dep_arch}.deb not found" 1>&2
-            return
-        fi
-
         (
             cd "$TERMUX_TOPDIR/_cache-${dep_arch}"
             if [ ! -f "${pkg_name}_${dep_version}_${dep_arch}.deb" ]; then
+                # Get path to the deb on the repo
+                deb_path=$(get_deb_path ${packages_file} $pkg_name $dep_version $dep_arch)
+                if [ -z "$deb_path" ]; then
+                    echo "${pkg_name}_${dep_version}_${dep_arch}.deb not found on repo" 1>&2
+                    return
+                fi
                 echo "Downloading ${repo_url}/${deb_path}" 1>&2
                 temp_deb=$(mktemp $TMPDIR/$(basename ${deb_path}).XXXXXX)
                 curl --fail -L -o "${temp_deb}" "${repo_url}/${deb_path}" || \
                     echo "Download of ${repo_url}/${deb_path} failed" 1>&2
                 mv ${temp_deb} $(basename ${deb_path})
             else
-                printf "%-50s %s\n" "$(basename ${deb_path})" "already downloaded" 1>&2
+                printf "%-50s %s\n" "${pkg_name}_${dep_version}_${dep_arch}.deb" "already downloaded" 1>&2
             fi
-            echo "$TERMUX_TOPDIR/_cache-${dep_arch}/$(basename ${deb_path})\n"
+            echo "$TERMUX_TOPDIR/_cache-${dep_arch}/${pkg_name}_${dep_version}_${dep_arch}.deb\n"
         )
     done
 }
