@@ -97,32 +97,32 @@ get_deb_path() {
 for repo in $repos; do
     case $repo in
         termux-packages)
-            repo_url="https://termux.org/packages"
+            repo_url="https://packages.termux.org/apt/termux-main"
             distribution="stable"
             component="main"
             ;;
         termux-root-packages)
-            repo_url="https://grimler.se/$repo-24"
+            repo_url="https://packages.termux.org/apt/termux-root"
             distribution="root"
             component="stable"
             ;;
         science-packages)
-            repo_url="https://grimler.se/$repo-24"
+            repo_url="https://packages.termux.org/apt/termux-science"
             distribution="science"
             component="stable"
             ;;
         game-packages)
-            repo_url="https://grimler.se/$repo-24"
+            repo_url="https://packages.termux.org/apt/termux-games"
             distribution="games"
             component="stable"
             ;;
         unstable-packages)
-            repo_url="https://termux.com/$repo-bin"
+            repo_url="https://packages.termux.org/apt/termux-unstable"
             distribution="unstable"
             component="main"
             ;;
         x11-packages)
-            repo_url="https://termux.com/$repo-bin"
+            repo_url="https://packages.termux.org/apt/termux-x11"
             distribution="x11"
             component="main"
             ;;
