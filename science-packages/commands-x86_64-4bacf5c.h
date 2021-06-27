@@ -100,6 +100,7 @@
 " ncdump",
 " ncgen",
 " ncgen3",
+" ocprint",
 "openbabel",
 " obabel",
 " obconformer",
