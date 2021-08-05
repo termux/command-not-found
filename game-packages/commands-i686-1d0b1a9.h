@@ -19,6 +19,7 @@
 " curseofwar",
 "dmagnetic",
 " dMagnetic",
+" magnetic-scrolls",
 "dopewars",
 " dopewars",
 "frotz",
