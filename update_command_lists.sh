@@ -142,9 +142,9 @@ for repo in $repos; do
         if [ "$current_commit" == "$new_commit" ]; then continue; fi
 
         updated_packages=$(cd $repo/$repo;
-                           git diff --dirstat=files,0 \
-                               ${current_commit}..${new_commit} \
-                               -- packages|awk '{if (gsub(/\//, "/") == 2) print $2}')
+                           git diff --name-status -C ${current_commit} ${new_commit} \
+                               -- packages|cut -f 2-|xargs dirname \
+                               |awk -F"/" '{print $1 "/" $2}'|sort|uniq)
 
         mkdir -p "$TERMUX_TOPDIR/_cache-${arch}"
         # Let's get Packages file for $arch so that we can parse it to get
