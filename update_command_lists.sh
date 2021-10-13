@@ -30,7 +30,7 @@ download_deb() {
     cd $repo/$repo
     TERMUX_SCRIPTDIR=.
 
-    for build_file in ${pkg_dir}/build.sh ${pkg_dir}*.subpackage.sh; do
+    for build_file in ${pkg_dir}/build.sh ${pkg_dir}/*.subpackage.sh; do
         if [ "$(basename $build_file)" == "build.sh" ]; then
             pkg_name=$pkg
         else
