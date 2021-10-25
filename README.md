@@ -8,7 +8,6 @@ contains lists of commands for the various official repositories:
 - [game-packages](https://github.com/termux/game-packages)
 - [science-packages](https://github.com/termux/science-packages)
 - [termux-root-packages](https://github.com/termux/termux-root-packages)
-- [unstable-packages](https://github.com/termux/unstable-packages)
 - [x11-packages](https://github.com/termux/x11-packages)
 
 in subfolders, and scripts (`update_command_list.sh`, `modify_command_list.py`)

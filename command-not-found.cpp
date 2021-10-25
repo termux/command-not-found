@@ -80,20 +80,6 @@ list<string> science_commands = {
 #endif
 };
 
-list<string> unstable_commands = {
-#ifdef __aarch64__
-# include "unstable-packages/commands-aarch64-a6e70cf.h"
-#elif defined __arm__
-# include "unstable-packages/commands-arm-a6e70cf.h"
-#elif defined __i686__
-# include "unstable-packages/commands-i686-a6e70cf.h"
-#elif defined __x86_64__
-# include "unstable-packages/commands-x86_64-a6e70cf.h"
-#else
-# error Failed to detect arch
-#endif
-};
-
 list<string> x11_commands = {
 #ifdef __aarch64__
 # include "x11-packages/commands-aarch64-89582be.h"
@@ -222,9 +208,6 @@ int main(int argc, const char *argv[]) {
   if (res != 0) { return res; }
 
   res = termux_look_for_packages(command, &science_commands, &best_distance, &package_map, "science");
-  if (res != 0) { return res; }
-
-  res = termux_look_for_packages(command, &unstable_commands, &best_distance, &package_map, "unstable");
   if (res != 0) { return res; }
 
   res = termux_look_for_packages(command, &x11_commands, &best_distance, &package_map, "x11");
