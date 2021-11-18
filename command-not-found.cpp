@@ -26,13 +26,13 @@ using namespace std;
 
 list<string> games_commands = {
 #ifdef __aarch64__
-# include "game-packages/commands-aarch64-66e53d2.h"
+# include "game-packages/commands-aarch64-608de5c.h"
 #elif defined __arm__
-# include "game-packages/commands-arm-66e53d2.h"
+# include "game-packages/commands-arm-608de5c.h"
 #elif defined __i686__
-# include "game-packages/commands-i686-66e53d2.h"
+# include "game-packages/commands-i686-608de5c.h"
 #elif defined __x86_64__
-# include "game-packages/commands-x86_64-66e53d2.h"
+# include "game-packages/commands-x86_64-608de5c.h"
 #else
 # error Failed to detect arch
 #endif
@@ -40,13 +40,13 @@ list<string> games_commands = {
 
 list<string> main_commands = {
 #ifdef __aarch64__
-# include "termux-packages/commands-aarch64-9bf4a88.h"
+# include "termux-packages/commands-aarch64-22ecf22.h"
 #elif defined __arm__
-# include "termux-packages/commands-arm-9bf4a88.h"
+# include "termux-packages/commands-arm-22ecf22.h"
 #elif defined __i686__
-# include "termux-packages/commands-i686-9bf4a88.h"
+# include "termux-packages/commands-i686-22ecf22.h"
 #elif defined __x86_64__
-# include "termux-packages/commands-x86_64-9bf4a88.h"
+# include "termux-packages/commands-x86_64-22ecf22.h"
 #else
 # error Failed to detect arch
 #endif
@@ -54,13 +54,13 @@ list<string> main_commands = {
 
 list<string> root_commands = {
 #ifdef __aarch64__
-# include "termux-root-packages/commands-aarch64-d32a06f.h"
+# include "termux-root-packages/commands-aarch64-1186f6e.h"
 #elif defined __arm__
-# include "termux-root-packages/commands-arm-d32a06f.h"
+# include "termux-root-packages/commands-arm-1186f6e.h"
 #elif defined __i686__
-# include "termux-root-packages/commands-i686-d32a06f.h"
+# include "termux-root-packages/commands-i686-1186f6e.h"
 #elif defined __x86_64__
-# include "termux-root-packages/commands-x86_64-d32a06f.h"
+# include "termux-root-packages/commands-x86_64-1186f6e.h"
 #else
 # error Failed to detect arch
 #endif
@@ -82,13 +82,13 @@ list<string> science_commands = {
 
 list<string> x11_commands = {
 #ifdef __aarch64__
-# include "x11-packages/commands-aarch64-9182296.h"
+# include "x11-packages/commands-aarch64-2ad69ca.h"
 #elif defined __arm__
-# include "x11-packages/commands-arm-9182296.h"
+# include "x11-packages/commands-arm-2ad69ca.h"
 #elif defined __i686__
-# include "x11-packages/commands-i686-9182296.h"
+# include "x11-packages/commands-i686-2ad69ca.h"
 #elif defined __x86_64__
-# include "x11-packages/commands-x86_64-9182296.h"
+# include "x11-packages/commands-x86_64-2ad69ca.h"
 #else
 # error Failed to detect arch
 #endif

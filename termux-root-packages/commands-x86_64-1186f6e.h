@@ -19,6 +19,8 @@
 " arp-scan",
 " get-iab",
 " get-oui",
+"bettercap",
+" bettercap",
 "containerd",
 " containerd",
 " containerd-shim",
