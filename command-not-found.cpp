@@ -26,13 +26,13 @@ using namespace std;
 
 list<string> main_commands = {
 #ifdef __aarch64__
-# include "termux-packages/commands-aarch64-22ecf22.h"
+# include "termux-packages/commands-aarch64-302a8cc.h"
 #elif defined __arm__
-# include "termux-packages/commands-arm-22ecf22.h"
+# include "termux-packages/commands-arm-302a8cc.h"
 #elif defined __i686__
-# include "termux-packages/commands-i686-22ecf22.h"
+# include "termux-packages/commands-i686-302a8cc.h"
 #elif defined __x86_64__
-# include "termux-packages/commands-x86_64-22ecf22.h"
+# include "termux-packages/commands-x86_64-302a8cc.h"
 #else
 # error Failed to detect arch
 #endif
@@ -54,13 +54,13 @@ list<string> root_commands = {
 
 list<string> science_commands = {
 #ifdef __aarch64__
-# include "science-packages/commands-aarch64-6fd4a80.h"
+# include "science-packages/commands-aarch64-e44883a.h"
 #elif defined __arm__
-# include "science-packages/commands-arm-6fd4a80.h"
+# include "science-packages/commands-arm-e44883a.h"
 #elif defined __i686__
-# include "science-packages/commands-i686-6fd4a80.h"
+# include "science-packages/commands-i686-e44883a.h"
 #elif defined __x86_64__
-# include "science-packages/commands-x86_64-6fd4a80.h"
+# include "science-packages/commands-x86_64-e44883a.h"
 #else
 # error Failed to detect arch
 #endif
@@ -68,13 +68,13 @@ list<string> science_commands = {
 
 list<string> x11_commands = {
 #ifdef __aarch64__
-# include "x11-packages/commands-aarch64-2ad69ca.h"
+# include "x11-packages/commands-aarch64-5bab637.h"
 #elif defined __arm__
-# include "x11-packages/commands-arm-2ad69ca.h"
+# include "x11-packages/commands-arm-5bab637.h"
 #elif defined __i686__
-# include "x11-packages/commands-i686-2ad69ca.h"
+# include "x11-packages/commands-i686-5bab637.h"
 #elif defined __x86_64__
-# include "x11-packages/commands-x86_64-2ad69ca.h"
+# include "x11-packages/commands-x86_64-5bab637.h"
 #else
 # error Failed to detect arch
 #endif

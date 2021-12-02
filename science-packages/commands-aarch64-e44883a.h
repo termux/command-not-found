@@ -42,6 +42,7 @@
 " gnucap-modelgen",
 "libgeos",
 " geos-config",
+" geosop",
 "libhdf5",
 " gif2h5",
 " gif2h5-shared",
