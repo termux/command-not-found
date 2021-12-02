@@ -52,20 +52,6 @@ list<string> root_commands = {
 #endif
 };
 
-list<string> science_commands = {
-#ifdef __aarch64__
-# include "science-packages/commands-aarch64-e44883a.h"
-#elif defined __arm__
-# include "science-packages/commands-arm-e44883a.h"
-#elif defined __i686__
-# include "science-packages/commands-i686-e44883a.h"
-#elif defined __x86_64__
-# include "science-packages/commands-x86_64-e44883a.h"
-#else
-# error Failed to detect arch
-#endif
-};
-
 list<string> x11_commands = {
 #ifdef __aarch64__
 # include "x11-packages/commands-aarch64-5bab637.h"
@@ -188,9 +174,6 @@ int main(int argc, const char *argv[]) {
   if (res != 0) { return res; }
 
   res = termux_look_for_packages(command, &root_commands, &best_distance, &package_map, "root");
-  if (res != 0) { return res; }
-
-  res = termux_look_for_packages(command, &science_commands, &best_distance, &package_map, "science");
   if (res != 0) { return res; }
 
   res = termux_look_for_packages(command, &x11_commands, &best_distance, &package_map, "x11");
