@@ -187,9 +187,6 @@ int main(int argc, const char *argv[]) {
   res = termux_look_for_packages(command, &main_commands, &best_distance, &package_map, "");
   if (res != 0) { return res; }
 
-  res = termux_look_for_packages(command, &games_commands, &best_distance, &package_map, "game");
-  if (res != 0) { return res; }
-
   res = termux_look_for_packages(command, &root_commands, &best_distance, &package_map, "root");
   if (res != 0) { return res; }
 
