@@ -24,20 +24,6 @@
 
 using namespace std;
 
-list<string> games_commands = {
-#ifdef __aarch64__
-# include "game-packages/commands-aarch64-608de5c.h"
-#elif defined __arm__
-# include "game-packages/commands-arm-608de5c.h"
-#elif defined __i686__
-# include "game-packages/commands-i686-608de5c.h"
-#elif defined __x86_64__
-# include "game-packages/commands-x86_64-608de5c.h"
-#else
-# error Failed to detect arch
-#endif
-};
-
 list<string> main_commands = {
 #ifdef __aarch64__
 # include "termux-packages/commands-aarch64-22ecf22.h"

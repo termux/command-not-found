@@ -4,7 +4,7 @@ shopt -s nullglob
 set -e
 
 if [ "$1" == "all" ]; then
-    repos="termux-packages termux-root-packages science-packages game-packages x11-packages"
+    repos="termux-packages termux-root-packages science-packages x11-packages"
 else
     repos="$1"
 fi
@@ -109,11 +109,6 @@ for repo in $repos; do
         science-packages)
             repo_url="https://packages.termux.org/apt/termux-science"
             distribution="science"
-            component="stable"
-            ;;
-        game-packages)
-            repo_url="https://packages.termux.org/apt/termux-games"
-            distribution="games"
             component="stable"
             ;;
         x11-packages)

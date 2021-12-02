@@ -1,9 +1,6 @@
 [submodule "root/termux-root-packages"]
 	path = termux-root-packages/termux-root-packages
 	url = https://github.com/termux/termux-root-packages
-[submodule "games/game-packages"]
-	path = game-packages/game-packages
-	url = https://github.com/termux/game-packages
 [submodule "science/science-packages"]
 	path = science-packages/science-packages
 	url = https://github.com/termux/science-packages
