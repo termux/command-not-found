@@ -58,7 +58,7 @@ download_deb() {
                 # Get path to the deb on the repo
                 deb_path=$(get_deb_path ${packages_file} $pkg_name $dep_version $dep_arch)
                 if [ -z "$deb_path" ]; then
-                    echo "${pkg_name}_${dep_version}_${dep_arch}.deb not found on repo" 1>&2
+                    printf "%-50s \e[31m%s\e[0m\n" "${pkg_name}_${dep_version}_${dep_arch}.deb" "not found in repo" 1>&2
                     return
                 fi
                 echo "Downloading ${repo_url}/${deb_path}" 1>&2
