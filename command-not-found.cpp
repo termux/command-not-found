@@ -26,13 +26,13 @@ using namespace std;
 
 list<string> main_commands = {
 #ifdef __aarch64__
-# include "termux-packages/commands-aarch64-026b032.h"
+# include "termux-packages/commands-aarch64-ee0de34.h"
 #elif defined __arm__
-# include "termux-packages/commands-arm-026b032.h"
+# include "termux-packages/commands-arm-ee0de34.h"
 #elif defined __i686__
-# include "termux-packages/commands-i686-026b032.h"
+# include "termux-packages/commands-i686-ee0de34.h"
 #elif defined __x86_64__
-# include "termux-packages/commands-x86_64-026b032.h"
+# include "termux-packages/commands-x86_64-ee0de34.h"
 #else
 # error Failed to detect arch
 #endif
@@ -54,13 +54,13 @@ list<string> root_commands = {
 
 list<string> x11_commands = {
 #ifdef __aarch64__
-# include "x11-packages/commands-aarch64-0a39dd9.h"
+# include "x11-packages/commands-aarch64-f7c869e.h"
 #elif defined __arm__
-# include "x11-packages/commands-arm-0a39dd9.h"
+# include "x11-packages/commands-arm-f7c869e.h"
 #elif defined __i686__
-# include "x11-packages/commands-i686-0a39dd9.h"
+# include "x11-packages/commands-i686-f7c869e.h"
 #elif defined __x86_64__
-# include "x11-packages/commands-x86_64-0a39dd9.h"
+# include "x11-packages/commands-x86_64-f7c869e.h"
 #else
 # error Failed to detect arch
 #endif
