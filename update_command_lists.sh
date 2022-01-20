@@ -45,7 +45,7 @@ download_deb() {
         # though so this error is not blocking. stderr is redirected to /dev/null below until a nicer
         # workaround can be found.
 
-        read dep_arch dep_version <<< $(termux_extract_dep_info $pkg_name "${pkg_dir}" 2>/dev/null)
+        read dep_arch dep_version ignore <<< $(termux_extract_dep_info $pkg_name "${pkg_dir}" 2>/dev/null)
         if [ -z "$dep_arch" ]; then
             # termux_extract_dep_info returned nothing so the package
             # is probably blacklisted for the current arch
