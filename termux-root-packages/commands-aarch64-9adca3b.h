@@ -19,6 +19,8 @@
 " arp-scan",
 " get-iab",
 " get-oui",
+"avrdude",
+" avrdude",
 "bettercap",
 " bettercap",
 "bindfs",

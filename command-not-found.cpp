@@ -26,13 +26,13 @@ using namespace std;
 
 list<string> main_commands = {
 #ifdef __aarch64__
-# include "termux-packages/commands-aarch64-5ea47ac.h"
+# include "termux-packages/commands-aarch64-b79db7c.h"
 #elif defined __arm__
-# include "termux-packages/commands-arm-5ea47ac.h"
+# include "termux-packages/commands-arm-b79db7c.h"
 #elif defined __i686__
-# include "termux-packages/commands-i686-5ea47ac.h"
+# include "termux-packages/commands-i686-b79db7c.h"
 #elif defined __x86_64__
-# include "termux-packages/commands-x86_64-5ea47ac.h"
+# include "termux-packages/commands-x86_64-b79db7c.h"
 #else
 # error Failed to detect arch
 #endif
@@ -40,13 +40,13 @@ list<string> main_commands = {
 
 list<string> root_commands = {
 #ifdef __aarch64__
-# include "termux-root-packages/commands-aarch64-3f66270.h"
+# include "termux-root-packages/commands-aarch64-9adca3b.h"
 #elif defined __arm__
-# include "termux-root-packages/commands-arm-3f66270.h"
+# include "termux-root-packages/commands-arm-9adca3b.h"
 #elif defined __i686__
-# include "termux-root-packages/commands-i686-3f66270.h"
+# include "termux-root-packages/commands-i686-9adca3b.h"
 #elif defined __x86_64__
-# include "termux-root-packages/commands-x86_64-3f66270.h"
+# include "termux-root-packages/commands-x86_64-9adca3b.h"
 #else
 # error Failed to detect arch
 #endif
@@ -54,13 +54,13 @@ list<string> root_commands = {
 
 list<string> x11_commands = {
 #ifdef __aarch64__
-# include "x11-packages/commands-aarch64-39a910c.h"
+# include "x11-packages/commands-aarch64-9c231df.h"
 #elif defined __arm__
-# include "x11-packages/commands-arm-39a910c.h"
+# include "x11-packages/commands-arm-9c231df.h"
 #elif defined __i686__
-# include "x11-packages/commands-i686-39a910c.h"
+# include "x11-packages/commands-i686-9c231df.h"
 #elif defined __x86_64__
-# include "x11-packages/commands-x86_64-39a910c.h"
+# include "x11-packages/commands-x86_64-9c231df.h"
 #else
 # error Failed to detect arch
 #endif
