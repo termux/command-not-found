@@ -5,8 +5,6 @@ Apart from the sources for the binary (`command-not-found.cpp`), it also
 contains lists of commands for the various official repositories:
 
 - [termux-packages](https://github.com/termux/termux-packages)
-- [game-packages](https://github.com/termux/game-packages)
-- [science-packages](https://github.com/termux/science-packages)
 - [termux-root-packages](https://github.com/termux/termux-root-packages)
 - [x11-packages](https://github.com/termux/x11-packages)
 
