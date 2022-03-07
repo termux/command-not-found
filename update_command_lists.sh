@@ -97,17 +97,17 @@ get_deb_path() {
 for repo in $repos; do
     case $repo in
         termux-packages)
-            repo_url="https://packages.termux.org/apt/termux-main"
+            repo_url="https://packages-cf.termux.org/apt/termux-main"
             distribution="stable"
             component="main"
             ;;
         termux-root-packages)
-            repo_url="https://packages.termux.org/apt/termux-root"
+            repo_url="https://packages-cf.termux.org/apt/termux-root"
             distribution="root"
             component="stable"
             ;;
         x11-packages)
-            repo_url="https://packages.termux.org/apt/termux-x11"
+            repo_url="https://packages-cf.termux.org/apt/termux-x11"
             distribution="x11"
             component="main"
             ;;
