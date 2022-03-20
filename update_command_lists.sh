@@ -27,7 +27,6 @@ download_deb() {
     packages_file=$3
     TERMUX_ARCH=$4
 
-    cd $repo/$repo
     TERMUX_SCRIPTDIR=.
 
     for build_file in ${pkg_dir}/build.sh ${pkg_dir}/*.subpackage.sh; do
@@ -126,11 +125,6 @@ for repo in $repos; do
                          |awk '{ if ($1 ~ /^+/) {print substr($1,2,7)} else {print substr($1,1,7)} }')
         if [ "$current_commit" == "$new_commit" ]; then continue; fi
 
-        updated_packages=$(cd $repo/$repo;
-                           git diff --name-status -C ${current_commit} ${new_commit} \
-                               -- packages|cut -f 2-|xargs dirname \
-                               |awk -F"/" '{print $1 "/" $2}'|sort|uniq)
-
         mkdir -p "$TERMUX_TOPDIR/_cache-${arch}"
         # Let's get Packages file for $arch so that we can parse it to get
         # path on repo to the deb we want to download.
@@ -140,10 +134,39 @@ for repo in $repos; do
         packages_file="$TERMUX_TOPDIR/_cache-${arch}/$(echo ${repo_url}|sed -e "s@https://@@g" -e "s@/@-@g")-$distribution-$component-binary-$arch-Packages"
         mv ${temp_packages} "$packages_file"
 
-        debs=""
+        pushd $repo/$repo
+        changed_files=$(git diff --name-status -C ${current_commit} ${new_commit} \
+                            -- packages | cut -f 2-)
+
         deleted_packages=""
+        updated_packages=""
+        for file in ${changed_files}; do
+            if [[ "$file" == "*.subpackage.sh" ]]; then
+                if [ ! -f "$file" ] && ! grep "^TERMUX_PKG_BLACKLISTED_ARCHES=.*$arch.*" "$(echo $file|cut -d/ -f 1-2)/build.sh">/dev/null; then
+                    # Subpackage seem to have been deleted,
+                    # we need to delete it from the command list
+                    deleted_packages+=" $(basename $file|sed "s@.subpackage.sh@@g")"
+                else
+                    # ut to only get first two levels of the path
+                    # (packages/foo).  with dirname we run into issues
+                    # with packages that have subfolders in
+                    # packages/foo/.
+                    updated_packages+=" $(echo $file | cut -d/ -f 1-2)"
+                fi
+            elif [ -d "$(dirname $file)" ] && ! grep "^TERMUX_PKG_BLACKLISTED_ARCHES=.*$arch.*" "$(echo $file|cut -d/ -f 1-2)/build.sh">/dev/null; then
+                updated_packages+=" $(echo $file | cut -d/ -f 1-2)"
+            else
+                # Package seem to have been deleted,
+                # we need to delete it from the command list
+                deleted_packages+=" $(echo $file | cut -d/ -f 1-2)"
+            fi
+        done
+
+        debs=""
+        updated_packages="$(echo $updated_packages | xargs -n 1 | sort | uniq)"
+        # echo "Updated $updated_packages" > /dev/stderr
         for package in ${updated_packages}; do
-            if [ -d $repo/$repo/$package ] && ! grep -q $arch < <(grep "^TERMUX_PKG_BLACKLISTED_ARCHES=" $repo/$repo/$package/build.sh); then
+            if [ -d $package ] && ! grep "^TERMUX_PKG_BLACKLISTED_ARCHES=.*$arch.*" "$(echo $file | cut -d/ -f 1-2)/build.sh">/dev/null; then
                 debs+="$(download_deb $(basename $package) $package ${packages_file} $arch)"
             else
                 # Package seem to have been deleted,
@@ -151,9 +174,14 @@ for repo in $repos; do
                 deleted_packages+=" $package"
             fi
         done
+
+        deleted_packages=$(echo $deleted_packages | xargs -n 1 | sort | uniq)
+        echo "Deleted $deleted_packages" > /dev/stderr
         if [ ! "$deleted_packages" == "" ]; then
             extra_args="--delete $deleted_packages"
         fi
+
+        popd
 
         # Length of $DEBS could be larger than ARG_MAX, at least on some
         # systems. To not risk such a problem we pipe the DEB list instead of
