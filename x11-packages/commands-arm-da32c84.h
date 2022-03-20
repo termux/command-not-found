@@ -72,6 +72,8 @@
 "fltk",
 " fltk-config",
 " fluid",
+"fltk-editor",
+" fltk-editor",
 "fluxbox",
 " fbrun",
 " fbsetbg",
