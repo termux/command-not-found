@@ -1,1 +1,16 @@
+# Python
 __pycache__
+
+# CMake build directory
+/build*
+
+## Editor/IDE/Code Lens
+# Vim
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+# VS Code
+/.vscode
+# ccls
+/.ccls-cache
+# Other
+/compile_commands.json
