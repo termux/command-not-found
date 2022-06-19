@@ -16,10 +16,11 @@
 #include <cstring>
 #include <map>
 #include <list>
+#include <sys/cdefs.h>
 #include <sys/stat.h>
 
-#ifndef PREFIX
-#error "PREFIX not defined"
+#ifndef __TERMUX_PREFIX__
+#error "__TERMUX_PREFIX__ not defined"
 #endif
 
 using namespace std;
@@ -168,7 +169,7 @@ int main(int argc, const char *argv[]) {
   map <string, info> package_map;
   map <string, info>::iterator it;
   int res;
-  string sources_prefix = string(PREFIX) + "/etc/apt/sources.list.d/";
+  string sources_prefix = string(__TERMUX_PREFIX__) + "/etc/apt/sources.list.d/";
 
   res = termux_look_for_packages(command, &main_commands, &best_distance, &package_map, "");
   if (res != 0) { return res; }
