@@ -4,6 +4,12 @@ __pycache__
 # CMake build directory
 /build*
 
+# Downloaded content
+/Contents*
+
+# Generated header files
+/commands-*.h
+
 ## Editor/IDE/Code Lens
 # Vim
 [._]*.s[a-w][a-z]

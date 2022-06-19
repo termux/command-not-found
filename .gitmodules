@@ -1,9 +1,0 @@
-[submodule "root/termux-root-packages"]
-	path = termux-root-packages/termux-root-packages
-	url = https://github.com/termux/termux-root-packages
-[submodule "termux-packages/termux-packages"]
-	path = termux-packages/termux-packages
-	url = https://github.com/termux/termux-packages
-[submodule "x11-packages/x11-packages"]
-	path = x11-packages/x11-packages
-	url = https://github.com/termux/x11-packages

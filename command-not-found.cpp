@@ -19,20 +19,20 @@
 #include <sys/stat.h>
 
 #ifndef PREFIX
-# define PREFIX "/data/data/com.termux/files/usr"
+#error "PREFIX not defined"
 #endif
 
 using namespace std;
 
 list<string> main_commands = {
 #ifdef __aarch64__
-# include "termux-packages/commands-aarch64-07a6725.h"
+# include "commands-aarch64-termux-main.h"
 #elif defined __arm__
-# include "termux-packages/commands-arm-07a6725.h"
+# include "commands-arm-termux-main.h"
 #elif defined __i686__
-# include "termux-packages/commands-i686-07a6725.h"
+# include "commands-i686-termux-main.h"
 #elif defined __x86_64__
-# include "termux-packages/commands-x86_64-07a6725.h"
+# include "commands-x86_64-termux-main.h"
 #else
 # error Failed to detect arch
 #endif
@@ -40,13 +40,13 @@ list<string> main_commands = {
 
 list<string> root_commands = {
 #ifdef __aarch64__
-# include "termux-root-packages/commands-aarch64-e862ec8.h"
+# include "commands-aarch64-termux-root.h"
 #elif defined __arm__
-# include "termux-root-packages/commands-arm-e862ec8.h"
+# include "commands-arm-termux-root.h"
 #elif defined __i686__
-# include "termux-root-packages/commands-i686-e862ec8.h"
+# include "commands-i686-termux-root.h"
 #elif defined __x86_64__
-# include "termux-root-packages/commands-x86_64-e862ec8.h"
+# include "commands-x86_64-termux-root.h"
 #else
 # error Failed to detect arch
 #endif
@@ -54,13 +54,13 @@ list<string> root_commands = {
 
 list<string> x11_commands = {
 #ifdef __aarch64__
-# include "x11-packages/commands-aarch64-da32c84.h"
+# include "commands-aarch64-termux-x11.h"
 #elif defined __arm__
-# include "x11-packages/commands-arm-da32c84.h"
+# include "commands-arm-termux-x11.h"
 #elif defined __i686__
-# include "x11-packages/commands-i686-da32c84.h"
+# include "commands-i686-termux-x11.h"
 #elif defined __x86_64__
-# include "x11-packages/commands-x86_64-da32c84.h"
+# include "commands-x86_64-termux-x11.h"
 #else
 # error Failed to detect arch
 #endif
