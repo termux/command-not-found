@@ -45,7 +45,9 @@ Object.keys(repoJSON).forEach((repo_path) => {
             });
           linesContainingPathToBinaries.forEach((line) => {
             const [pathToBinary, packageNames] = line.split(" ");
-            const binary = pathToBinary.substring(binPrefix.length);
+            const binary = pathToBinary.substring(
+              pathToBinary.lastIndexOf("/") + 1
+            );
             const packages = packageNames.split(",");
 
             packages.forEach((packageName) => {
