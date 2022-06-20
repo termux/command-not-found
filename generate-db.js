@@ -1,4 +1,4 @@
-#!/usr/bin/node
+#!/usr/bin/env node
 const fs = require("node:fs");
 const https = require("node:https");
 const path = require("node:path");
