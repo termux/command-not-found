@@ -2,19 +2,19 @@
 
 This repo contains sources for the command-not-found utility used in termux.
 Apart from the sources for the binary (`command-not-found.cpp`), it also
-contains lists of commands for the various official repositories:
+contains a script to generate lists of commands for the various official
+repositories:
 
-- [termux-packages](https://github.com/termux/termux-packages)
-- [termux-root-packages](https://github.com/termux/termux-root-packages)
-- [x11-packages](https://github.com/termux/x11-packages)
-
-in subfolders, and scripts (`update_command_list.sh`, `modify_command_list.py`)
-for handling these lists.
+- [main repo](https://github.com/termux/termux-packages/tree/master/packages)
+- [root repo](https://github.com/termux/termux-packages/tree/master/root-packages)
+- [x11 repo](https://github.com/termux/termux-packages/tree/master/x11-packages)
 
 ## Building command-not-found
 
 To build the package, `cmake` and a c++ compiler (for example `g++` or `clang++`)
 needs to be installed.
+Apart from `cmake` and a C++ compiler, `nodejs` is also needed in order to
+generate list of commands.
 To do an out of source build, run these commands from the command-not-found
 directory:
 
@@ -24,7 +24,8 @@ cmake ..
 make
 ```
 
-This will create a command-not-found binary which can be tested directly.
+This will generate command lists by running `./generate-db.js`, and create
+a command-not-found binary which can be tested directly.
 To then install the program, run:
 
 ```sh
@@ -36,51 +37,6 @@ is where command-not-found resides in termux.
 
 ## Updating the command lists
 
-To generate new lists of commands you first need to update the submodule to the
-commit you want to use. To update all repos to the latest commit available, run
-
-```sh
-git submodule update --init --remote
-```
-
-or to just update a single repo to the latest commit, run
-
-```sh
-git submodule update --init --remote <repo>
-```
-
-If you do not want to use the latest commit you can checkout another one by
-running, from the command-not-found main folder:
-
-```sh
-cd <repo>/<repo>
-git checkout <commit-number>
-```
-
-Now that the submodules are at the correct commits, `update_command_list.sh`
-can be run. The script uses the previously checked in command list
-(`<repo>/commands-<arch>-<commit>.h`) and checks which packages have been
-updated between that commit and the currently checked out one. It then
-downloads these deb archives (unless they already exist in the
-`$TERMUX_TOPDIR/_cache-<arch>`-folder), creates new command lists and then
-modifies command-not-found.cpp to use the new lists. To update the lists, run:
-
-```sh
-./update_command_lists.sh <repo, or 'all'>
-```
-
-This might take a while since it needs to download a lot of deb archives.
-After this finishes the new command lists, and updated command-not-found.cpp,
-can be checked into git, and the old lists removed. This can be done with:
-
-```sh
-# Remove currently checked in command lists
-git rm $(git ls-files <repo>/commands-*.h)
-# Add new command lists and updated submodule
-git add <repo>
-# Add command-not-found.cpp, pointing to the new command lists
-git add command-not-found.cpp
-# Check in into git, with some message
-git commit
-```
-
+In order to update the command lists, just a rebuild of command-not-found
+is to be done by bumping the `TERMUX_PKG_REVISION` in build recipe of
+command-not-found.
