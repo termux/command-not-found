@@ -188,7 +188,7 @@ int main(int argc, const char *argv[]) {
       cerr << " pkg install " << it->first;
       if (it->second.repository != "" &&
           !file_exists(sources_prefix + it->second.repository + ".list")) {
-        cerr << ", after running pkg in " << it->second.repository << "-repo" << endl;
+        cerr << ", after running pkg install " << it->second.repository << "-repo" << endl;
       } else {
         cerr << endl;
       }
