@@ -8,6 +8,7 @@ const repositoryURL = "https://packages-cf.termux.dev/apt";
 // TODO(@thunder-coding): Do not hardcode list of known architectures.
 const archs = ["aarch64", "arm", "i686", "x86_64"];
 const scriptdir = process.env["TERMUX_SCRIPTDIR"];
+const defaultPrefixRegExp = /^data\/data\/com\.termux\/files\/usr/g;
 const prefix = process.env["TERMUX_PREFIX"];
 if (scriptdir === undefined) {
   throw new Error("TERMUX_SCRIPTDIR environment variable is not defined");
@@ -56,8 +57,10 @@ Object.keys(repoJSON).forEach((repo_path) => {
     promises.push(fetchFile(reqUrl).then((rawBuffer) => {
       let binMap = {};
       let ungzipped = zlib.gunzipSync(rawBuffer).toString();
-      let linesContainingPathToBinaries = ungzipped
+      let lines = ungzipped
         .split("\n")
+        .map(s => s.replace(defaultPrefixRegExp, prefix.substring(1)));
+      let linesContainingPathToBinaries = lines
         .filter((line) => {
           return line.startsWith(binPrefix);
         });
@@ -89,6 +92,7 @@ Object.keys(repoJSON).forEach((repo_path) => {
       if (fs.existsSync(headerFile)) {
         fs.rmSync(headerFile);
       }
+      if (content.replace(/\n/g, "") === "") throw new Error(`content is empty`);
       const encoding = "utf-8";
       fs.writeFileSync(headerFile, content, { encoding: encoding });
       if (fs.readFileSync(headerFile, { encoding: encoding }) !== content) throw new Error(`error writting to ${headerFile}`);
