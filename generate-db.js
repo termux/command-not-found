@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const fs = require("node:fs");
-const https = require("node:https");
+const http2 = require("node:http2");
 const path = require("node:path");
 const zlib = require("node:zlib");
 
@@ -21,31 +21,49 @@ const binPrefix = prefix.substring(1) + "/bin/";
 const repoBuffer = fs.readFileSync(path.join(scriptdir, "repo.json"));
 const repoJSON = JSON.parse(repoBuffer);
 
-const fetchFile = (url) => new Promise((resolve, reject) => {
-  let req = https.get(url);
-  req.on("error", (err) => {
-    req.destroy();
+const http2session = http2.connect(repositoryURL);
+const connectedPromise = new Promise((resolve, reject) => {
+  http2session.on("error", (err) => {
+    http2session.destroy();
     reject(err);
   });
-
-  req.on("response", (res) => {
-    if (res.statusCode != 200) {
-      req.destroy(); res.destroy();
-      reject(new Error(`${url} returned ${res.statusCode}`));
-    }
-    res.on("error", (err) => {
-      req.destroy(); res.destroy();
+  http2session.on("connect", () => {
+    resolve();
+  });
+});
+const fetchFile = (url) => new Promise((resolve, reject) => {
+  if (http2session.destroyed) {
+    reject(new Error(`http2session has been destroyed`));
+    return;
+  }
+  connectedPromise.then(() => {
+    url = new URL(url);
+    let req = http2session.request({
+      [http2.constants.HTTP2_HEADER_METHOD]: http2.constants.HTTP2_METHOD_GET,
+      [http2.constants.HTTP2_HEADER_PATH]: `${url.pathname}${url.search}`,
+    }).end();
+    req.on("error", (err) => {
+      req.destroy();
       reject(err);
     });
 
+    req.on("response", (headers, flags) => {
+      const respStatusCode = headers[http2.constants.HTTP2_HEADER_STATUS];
+      if (respStatusCode != 200) {
+        req.destroy();
+        reject(new Error(`${url} returned ${respStatusCode}`));
+      }
+    });
     let rawData = [];
-    res.on("data", (chunk) => {
+    req.on("data", (chunk) => {
       rawData.push(chunk);
     });
-    res.on("end", () => {
-      req.destroy(); res.destroy();
+    req.on("end", () => {
+      req.destroy();
       resolve(Buffer.concat(rawData));
     });
+  }).catch((e) => {
+    reject(e);
   });
 });
 
