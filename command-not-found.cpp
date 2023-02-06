@@ -12,20 +12,20 @@
  * limitations under the License.
  */
 
-#include <string>
+#include <cstring>
+#include <filesystem>
 #include <iostream>
 #include <list>
 #include <map>
+#include <string>
+#include <string_view>
 #include <sys/cdefs.h>
-#include <sys/stat.h>
 
 #ifndef __TERMUX_PREFIX__
 #error "__TERMUX_PREFIX__ not defined"
 #endif
 
-using namespace std;
-
-const list<string> main_commands = {
+const std::list<std::string_view> main_commands = {
 #ifdef __aarch64__
 #include "commands-aarch64-termux-main.h"
 #elif defined __arm__
@@ -39,7 +39,7 @@ const list<string> main_commands = {
 #endif
 };
 
-const list<string> root_commands = {
+const std::list<std::string_view> root_commands = {
 #ifdef __aarch64__
 #include "commands-aarch64-termux-root.h"
 #elif defined __arm__
@@ -53,7 +53,7 @@ const list<string> root_commands = {
 #endif
 };
 
-const list<string> x11_commands = {
+const std::list<std::string_view> x11_commands = {
 #ifdef __aarch64__
 #include "commands-aarch64-termux-x11.h"
 #elif defined __arm__
@@ -68,14 +68,8 @@ const list<string> x11_commands = {
 };
 
 struct info {
-  string binary, repository;
+  std::string binary, repository;
 };
-
-/* https://stackoverflow.com/a/12774387 */
-inline bool file_exists(const string &name) {
-  struct stat buffer;
-  return (stat(name.c_str(), &buffer) == 0);
-}
 
 inline int termux_min3(int a, int b, int c) {
   return (a < b ? (a < c ? a : c) : (b < c ? b : c));
@@ -90,14 +84,14 @@ int termux_levenshtein_distance(char const *s1, char const *s2) {
   matrix = (int **)malloc(sizeof *matrix * (s2len + 1));
 
   if (!matrix) {
-    cerr << "Memory allocation seem to have failed" << endl;
+    std::cerr << "Memory allocation seem to have failed" << std::endl;
     return -2;
   }
 
   matrix[0] = (int *)malloc(sizeof *matrix[0] * (s1len + 1));
 
   if (!matrix[0]) {
-    cerr << "Memory allocation seem to have failed" << endl;
+    std::cerr << "Memory allocation seem to have failed" << std::endl;
     return -3;
   }
 
@@ -106,7 +100,7 @@ int termux_levenshtein_distance(char const *s1, char const *s2) {
     matrix[x] = (int *)malloc(sizeof *matrix[x] * (s1len + 1));
 
     if (!matrix[x]) {
-      cerr << "Memory allocation seem to have failed" << endl;
+      std::cerr << "Memory allocation seem to have failed" << std::endl;
       return -4;
     }
 
@@ -132,14 +126,16 @@ int termux_levenshtein_distance(char const *s1, char const *s2) {
   return distance;
 }
 
-int termux_look_for_packages(const char *command_not_found, const list<string> &cmds,
-                             int *best_distance, map<string, info> &pkg_map,
+int termux_look_for_packages(const char *command_not_found,
+                             const std::list<std::string_view> &cmds,
+                             int *best_distance,
+                             std::map<std::string, info> &pkg_map,
                              const char repository[]) {
-  string current_package;
-  string current_binary;
+  std::string current_package;
+  std::string current_binary;
   int distance;
-  for ( auto it = cmds.begin(); it != cmds.end(); ++it) {
-    string current_line = *it;
+  for (auto it = cmds.begin(); it != cmds.end(); ++it) {
+    std::string_view current_line = *it;
     if (current_line[0] != ' ') {
       current_package = current_line;
     } else {
@@ -151,14 +147,14 @@ int termux_look_for_packages(const char *command_not_found, const list<string> &
         return -distance;
       } else if (*best_distance == distance) {
         // As good as our previously best match
-        pkg_map.insert(
-            pair<string, info>(current_package, {current_binary, repository}));
+        pkg_map.insert(std::pair<std::string, info>(
+            current_package, {current_binary, repository}));
       } else if (*best_distance == -1 || distance < *best_distance) {
         // New best match
         pkg_map.clear();
         *best_distance = distance;
-        pkg_map.insert(
-            pair<string, info>(current_package, {current_binary, repository}));
+        pkg_map.insert(std::pair<std::string, info>(
+            current_package, {current_binary, repository}));
       }
     }
   }
@@ -167,17 +163,17 @@ int termux_look_for_packages(const char *command_not_found, const list<string> &
 
 int main(int argc, const char *argv[]) {
   if (argc != 2) {
-    cerr << "usage: command-not-found <command>" << endl;
+    std::cerr << "usage: command-not-found <command>" << std::endl;
     return 1;
   }
 
   const char *command = argv[1];
   int best_distance = -1;
-  map<string, info> package_map;
-  map<string, info>::iterator it;
+  std::map<std::string, info> package_map;
+  std::map<std::string, info>::iterator it;
   int res;
-  string sources_prefix =
-      string(__TERMUX_PREFIX__) + "/etc/apt/sources.list.d/";
+  std::string_view sources_prefix =
+      __TERMUX_PREFIX__ "/etc/apt/sources.list.d/";
 
   res = termux_look_for_packages(command, main_commands, &best_distance,
                                  package_map, "");
@@ -198,33 +194,37 @@ int main(int argc, const char *argv[]) {
   }
 
   if (best_distance == -1 || best_distance > 3) {
-    cerr << command << ": command not found" << endl;
+    std::cerr << command << ": command not found" << std::endl;
   } else if (best_distance == 0) {
-    cerr << "The program " << command
-         << " is not installed. Install it by executing:" << endl;
+    std::cerr << "The program " << command
+              << " is not installed. Install it by executing:" << std::endl;
     for (it = package_map.begin(); it != package_map.end(); ++it) {
-      cerr << " pkg install " << it->first;
+      std::cerr << " pkg install " << it->first;
       if (it->second.repository != "" &&
-          !file_exists(sources_prefix + it->second.repository + ".list")) {
-        cerr << ", after running pkg install " << it->second.repository
-             << "-repo" << endl;
+          !std::filesystem::exists(std::string(sources_prefix) +
+                                   it->second.repository + ".list")) {
+        std::cerr << ", after running pkg install " << it->second.repository
+                  << "-repo" << std::endl;
       } else {
-        cerr << endl;
+        std::cerr << std::endl;
       }
       if (next(it) != package_map.end()) {
-        cerr << "or" << endl;
+        std::cerr << "or" << std::endl;
       }
     }
   } else {
-    cerr << "No command " << command << " found, did you mean:" << endl;
+    std::cerr << "No command " << command
+              << " found, did you mean:" << std::endl;
     for (it = package_map.begin(); it != package_map.end(); ++it) {
-      cerr << " Command " << it->second.binary << " in package " << it->first;
+      std::cerr << " Command " << it->second.binary << " in package "
+                << it->first;
       if (it->second.repository != "" &&
-          !file_exists(sources_prefix + it->second.repository + ".list")) {
-        cerr << " from the " << it->second.repository << "-repo repository"
-             << endl;
+          !std::filesystem::exists(std::string(sources_prefix) +
+                                   it->second.repository + ".list")) {
+        std::cerr << " from the " << it->second.repository << "-repo repository"
+                  << std::endl;
       } else {
-        cerr << endl;
+        std::cerr << std::endl;
       }
     }
   }
