@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-#include <cstring>
+#include <string>
 #include <iostream>
 #include <list>
 #include <map>
@@ -25,7 +25,7 @@
 
 using namespace std;
 
-list<string> main_commands = {
+const list<string> main_commands = {
 #ifdef __aarch64__
 #include "commands-aarch64-termux-main.h"
 #elif defined __arm__
@@ -39,7 +39,7 @@ list<string> main_commands = {
 #endif
 };
 
-list<string> root_commands = {
+const list<string> root_commands = {
 #ifdef __aarch64__
 #include "commands-aarch64-termux-root.h"
 #elif defined __arm__
@@ -53,7 +53,7 @@ list<string> root_commands = {
 #endif
 };
 
-list<string> x11_commands = {
+const list<string> x11_commands = {
 #ifdef __aarch64__
 #include "commands-aarch64-termux-x11.h"
 #elif defined __arm__
@@ -132,14 +132,13 @@ int termux_levenshtein_distance(char const *s1, char const *s2) {
   return distance;
 }
 
-int termux_look_for_packages(const char *command_not_found, list<string> *cmds,
-                             int *best_distance, void *guesses_at_best_distance,
+int termux_look_for_packages(const char *command_not_found, const list<string> &cmds,
+                             int *best_distance, map<string, info> &pkg_map,
                              const char repository[]) {
   string current_package;
   string current_binary;
   int distance;
-  map<string, info> *pkg_map = (map<string, info> *)guesses_at_best_distance;
-  for (list<string>::iterator it = (*cmds).begin(); it != (*cmds).end(); ++it) {
+  for ( auto it = cmds.begin(); it != cmds.end(); ++it) {
     string current_line = *it;
     if (current_line[0] != ' ') {
       current_package = current_line;
@@ -152,13 +151,13 @@ int termux_look_for_packages(const char *command_not_found, list<string> *cmds,
         return -distance;
       } else if (*best_distance == distance) {
         // As good as our previously best match
-        (*pkg_map).insert(
+        pkg_map.insert(
             pair<string, info>(current_package, {current_binary, repository}));
       } else if (*best_distance == -1 || distance < *best_distance) {
         // New best match
-        (*pkg_map).clear();
+        pkg_map.clear();
         *best_distance = distance;
-        (*pkg_map).insert(
+        pkg_map.insert(
             pair<string, info>(current_package, {current_binary, repository}));
       }
     }
@@ -174,29 +173,26 @@ int main(int argc, const char *argv[]) {
 
   const char *command = argv[1];
   int best_distance = -1;
-  struct info {
-    string binary, repository;
-  };
   map<string, info> package_map;
   map<string, info>::iterator it;
   int res;
   string sources_prefix =
       string(__TERMUX_PREFIX__) + "/etc/apt/sources.list.d/";
 
-  res = termux_look_for_packages(command, &main_commands, &best_distance,
-                                 &package_map, "");
+  res = termux_look_for_packages(command, main_commands, &best_distance,
+                                 package_map, "");
   if (res != 0) {
     return res;
   }
 
-  res = termux_look_for_packages(command, &root_commands, &best_distance,
-                                 &package_map, "root");
+  res = termux_look_for_packages(command, root_commands, &best_distance,
+                                 package_map, "root");
   if (res != 0) {
     return res;
   }
 
-  res = termux_look_for_packages(command, &x11_commands, &best_distance,
-                                 &package_map, "x11");
+  res = termux_look_for_packages(command, x11_commands, &best_distance,
+                                 package_map, "x11");
   if (res != 0) {
     return res;
   }
