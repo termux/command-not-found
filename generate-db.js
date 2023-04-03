@@ -4,7 +4,7 @@ const https = require("node:https");
 const path = require("node:path");
 const zlib = require("node:zlib");
 
-const repositoryURL = "https://packages-cf.termux.dev/apt";
+const repositoryURL = "https://helloanwar.com/neptune-terminal-repo/apt";
 // TODO(@thunder-coding): Do not hardcode list of known architectures.
 const archs = ["aarch64", "arm", "i686", "x86_64"];
 const scriptdir = process.env["TERMUX_SCRIPTDIR"];
@@ -60,10 +60,12 @@ Object.keys(repoJSON).forEach((repo_path) => {
           const headerFile = `commands-${arch}-${repo.name}.h`;
           if (fs.existsSync(headerFile)) {
             fs.rmSync(headerFile);
+            console.log(`removing file: ${headerFile} \n`)
           }
           Object.keys(binMap)
             .sort()
             .forEach((packageName) => {
+              console.log(`appending file: ${headerFile} \n`)
               fs.appendFileSync(headerFile, `"${packageName}",\n`);
               binMap[packageName].sort().forEach((packageName) => {
                 fs.appendFileSync(headerFile, `" ${packageName}",\n`);
