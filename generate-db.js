@@ -20,9 +20,9 @@ const binPrefix = prefix.substring(1) + "/bin/";
 const repoBuffer = fs.readFileSync(path.join(scriptdir, "repo.json"));
 const repoJSON = JSON.parse(repoBuffer);
 
-Object.keys(repoJSON).forEach((repo_path) => {
+for (const repo_path in repoJSON) {
   const repo = repoJSON[repo_path];
-  archs.forEach((arch) => {
+  for (const arch of archs) {
     https.get(
       `${repositoryURL}/${repo.name}/dists/${repo.distribution}/Contents-${arch}.gz`,
       (res) => {
@@ -72,5 +72,5 @@ Object.keys(repoJSON).forEach((repo_path) => {
         });
       }
     );
-  });
-});
+  }
+}
