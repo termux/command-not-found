@@ -4,7 +4,6 @@ const https = require("node:https");
 const path = require("node:path");
 const zlib = require("node:zlib");
 
-const repositoryURL = "https://packages-cf.termux.dev/apt";
 // TODO(@thunder-coding): Do not hardcode list of known architectures.
 const archs = ["aarch64", "arm", "i686", "x86_64"];
 const scriptdir = process.env["TERMUX_SCRIPTDIR"];
@@ -24,7 +23,7 @@ for (const repo_path in repoJSON) {
   const repo = repoJSON[repo_path];
   for (const arch of archs) {
     https.get(
-      `${repositoryURL}/${repo.name}/dists/${repo.distribution}/Contents-${arch}.gz`,
+      `${repo.url}/dists/${repo.distribution}/Contents-${arch}.gz`,
       (res) => {
         if (res.statusCode != 200) {
           throw new Error(`${res.url} returned ${res.statusCode}`);
