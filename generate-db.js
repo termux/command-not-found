@@ -20,6 +20,9 @@ const repoBuffer = fs.readFileSync(path.join(scriptdir, "repo.json"));
 const repoJSON = JSON.parse(repoBuffer);
 
 for (const repo_path in repoJSON) {
+  if (repo_path === "pkg_format") {
+    continue;
+  }
   const repo = repoJSON[repo_path];
   for (const arch of archs) {
     https.get(
