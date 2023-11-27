@@ -8,10 +8,10 @@ const gunzipAsync = promisify(gunzip);
 
 // TODO(@thunder-coding): Do not hardcode list of known architectures.
 const archs = ["aarch64", "arm", "i686", "x86_64"];
-const { TERMUX_SCRIPTDIR, TERMUX_PREFIX } = process.env;
+const { TERMUX_PKG_CACHEDIR, TERMUX_PREFIX } = process.env;
 
-if (!TERMUX_SCRIPTDIR) {
-  throw new Error('TERMUX_SCRIPTDIR environment variable is not defined');
+if (!TERMUX_PKG_CACHEDIR) {
+  throw new Error('TERMUX_PKG_CACHEDIR environment variable is not defined');
 }
 
 if (!TERMUX_PREFIX) {
@@ -19,7 +19,7 @@ if (!TERMUX_PREFIX) {
 }
 
 const binPrefix = TERMUX_PREFIX.substring(1) + '/bin/';
-const repos = JSON.parse(await readFile(join(TERMUX_SCRIPTDIR, 'repo.json')));
+const repos = JSON.parse(await readFile(join(TERMUX_PKG_CACHEDIR, 'repo.json')));
 
 async function processRepo(repo) {
   for (const arch of archs) {
