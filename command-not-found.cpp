@@ -163,7 +163,8 @@ int termux_look_for_packages(const char *command_not_found,
 
 int main(int argc, const char *argv[]) {
   if (argc != 2) {
-    std::cerr << "usage: command-not-found <command>" << std::endl;
+    std::cerr << "command-not-found v" COMMAND_NOT_FOUND_VERSION << std::endl
+              << "usage: command-not-found <command>" << std::endl;
     return 1;
   }
 
