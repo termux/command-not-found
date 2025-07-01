@@ -36,6 +36,8 @@ const repos = JSON.parse(
  * - `alternative`: The alternative path.
  * - `dependents`: An array of dependents, each with `link`, `name`, and `path`. This is the list of slaves of the alternative. If there is no dependents, it'll be an empty array for consistency
  * - `priority`: The priority of the alternative.
+ *
+ * Note that both the name and path do not start with TERMUX_PREFIX, but instead start with the relative path from TERMUX_PREFIX.
  */
 async function parseAlternativeFile(filePath) {
   const content = await readFile(filePath, "utf8");
@@ -49,13 +51,18 @@ async function parseAlternativeFile(filePath) {
   const alternatives = [];
 
   for (let line of content.split("\n")) {
+    // Remove trailing comment
+    // Comment starts with a '#' and can be at the end of the line as well
     let match = line.match(/\s*#.*/);
     line = line.substring(0, match === null ? line.length : match.index);
+
+
     if (line.startsWith("Name: ")) {
       if (parsingDependents) {
         parsingDependents = false;
       }
 
+      // We already had a alternative entry, so push what we have parsed so far as an alternative entry
       if (name !== undefined) {
         alternatives.push({
           name: name,
@@ -92,11 +99,18 @@ async function parseAlternativeFile(filePath) {
       parsingDependents = true;
     }
 
+    // Parse the dependents entry here
     if (parsingDependents) {
       line = line.trim();
+      // We have not parsed any dependents yet, so we initialize the dependents array
       if (dependents === undefined) {
         dependents = [];
       }
+      // We trim the line to remove the leading indentation
+      // The line should be in the format: "->link name path"
+      // "->" is the leading indent
+      // We use the regex \s+ to split the line into parts since the there can
+      // be multiple spaces used for separating the parts for enhancing readibility
       const [dependentLink, dependentName, dependentPath] = line
         .trim()
         .split(/\s+/);
@@ -110,6 +124,8 @@ async function parseAlternativeFile(filePath) {
     }
   }
 
+  // After parsing the entire file, if we have a name, this means this is the
+  // final entry. So push it as well
   if (name !== undefined) {
     alternatives.push({
       name: name,
@@ -123,6 +139,7 @@ async function parseAlternativeFile(filePath) {
 }
 
 async function processRepo(repo, repoPath, arch) {
+  // Fetch the Contents.gz file for the given architecture from the apt mirror
   const url = `${repo.url}/dists/${repo.distribution}/Contents-${arch}.gz`;
   const response = await fetch(url);
 
@@ -130,16 +147,33 @@ async function processRepo(repo, repoPath, arch) {
     throw new Error(`${url} returned ${response.status}`);
   }
 
+  // Since we are using a gzip file, we need to decompress it
   const data = await gunzipAsync(await response.arrayBuffer());
-  const binMap = new Map();
+  // Convert to string and split by new lines
+  // Each line is of the format:
+  // "path/to/file package"
+  //
+  // Where `path/to/file` is the path to the file in the package, and `package`
+  // is the name of the package that provides this file.
   const lines = data.toString().split("\n");
 
+  // Stores mappings of binary names to package names
+  // The key is the binary name, and the value is an array of package names
+  // that provide this binary
+  const binMap = new Map();
+
+  // Stores mappings of file paths to package names
+  // This is needed to resolve the package names for binaries that are setup
+  // using the alternatives system
   const fileMap = new Map();
+  // Populate the fileMap
   lines.forEach((line) => {
     const [path, packageName] = line.split(" ");
     fileMap.set(path, packageName);
   });
 
+  // Now filter the entries from Contents.gz that have binaries, and store them
+  // in binMap
   lines
     .filter((line) => line.startsWith(binPrefix))
     .forEach((line) => {
@@ -155,6 +189,8 @@ async function processRepo(repo, repoPath, arch) {
       });
     });
 
+  // Now go through all the *.alternatives files in the repository and parse
+  // them to find the alternatives and their dependents
   repoPath = join(TERMUX_PKG_CACHEDIR, repoPath);
   for await (const file of glob(`${repoPath}/*/*.alternatives`, {
     nodir: true,
