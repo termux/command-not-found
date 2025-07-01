@@ -131,7 +131,7 @@ async function processRepo(repo, repoPath, arch) {
   }
 
   const data = await gunzipAsync(await response.arrayBuffer());
-  const binMap = {};
+  const binMap = new Map();
   const lines = data.toString().split("\n");
 
   const fileMap = new Map();
@@ -148,8 +148,10 @@ async function processRepo(repo, repoPath, arch) {
       const packages = packageNames.split(",");
 
       packages.forEach((packageName) => {
-        binMap[packageName] ??= [];
-        binMap[packageName].push(binary);
+        if (!binMap.has(packageName)) {
+          binMap.set(packageName, []);
+        }
+        binMap.get(packageName).push(binary);
       });
     });
 
@@ -173,21 +175,29 @@ async function processRepo(repo, repoPath, arch) {
           console.error(`Package name not found for path: ${path}`);
           process.exit(1);
         }
-        binMap[packageName] ??= [];
-        binMap[packageName].push(binary);
+        if (!binMap.has(packageName)) {
+          binMap.set(packageName, []);
+        }
+        binMap.get(packageName).push(binary);
         alternativeEntry.dependents.forEach(({ link, name, path }) => {
           if (link.startsWith("bin/")) {
             const depPackageName = fileMap.get(
               join(TERMUX_PREFIX.substring(1), path),
             );
             const depBinary = link.substring(link.lastIndexOf("/") + 1);
-            binMap[depPackageName] ??= [];
-            binMap[depPackageName].push(depBinary);
+            if (!binMap.has(depPackageName)) {
+              binMap.set(depPackageName, []);
+            }
+            binMap.get(depPackageName).push(depBinary);
           }
           // Register the link in the fileMap for the package
           // This is used by vim.alternatives where bin/vim is a link with alternative libexec/vim/vim
           // and bin/editor is a link with alternative bin/vim
           fileMap.set(join(TERMUX_PREFIX.substring(1), link), packageName);
+          if (!binMap.has(packageName)) {
+            binMap.set(packageName, []);
+          }
+          binMap.get(packageName).push(binary);
         });
       }
       // Register the link in the fileMap for the package
@@ -203,14 +213,17 @@ async function processRepo(repo, repoPath, arch) {
   // Sort the binaries for each package in alphabetical order
   // This is needed as the '*.alternatives' files are not guaranteed to be in any order
   for (const packageName in binMap) {
-    binMap[packageName].sort();
+    binMap.get(packageName).sort();
   }
 
   const headerFile = `commands-${arch}-${repo.name}.h`;
-  const header = Object.keys(binMap)
+  const header = Array.from(binMap.keys())
     .sort()
     .map((packageName) => {
-      const binaries = binMap[packageName].sort().map((bin) => `" ${bin}",`);
+      const binaries = binMap
+        .get(packageName)
+        .sort()
+        .map((bin) => `" ${bin}",`);
       return `"${packageName}",\n${binaries.join("\n")}`;
     })
     .join("\n");
