@@ -3,7 +3,7 @@ project (command-not-found)
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(COMMAND_NOT_FOUND_VERSION "3.0-git")
+set(COMMAND_NOT_FOUND_VERSION "3.0")
 
 add_custom_target(generate-db COMMAND ./generate-db.js WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 add_executable(command-not-found command-not-found.cpp)
