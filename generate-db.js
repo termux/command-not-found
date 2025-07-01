@@ -179,7 +179,7 @@ async function processRepo(repo, repoPath, arch) {
           binMap.set(packageName, []);
         }
         binMap.get(packageName).push(binary);
-        alternativeEntry.dependents.forEach(({ link, name, path }) => {
+        alternativeEntry.dependents.forEach(({ link, name: _, path }) => {
           if (link.startsWith("bin/")) {
             const depPackageName = fileMap.get(
               join(TERMUX_PREFIX.substring(1), path),
