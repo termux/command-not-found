@@ -6,9 +6,9 @@ import { promisify } from "node:util";
 
 const gunzipAsync = promisify(gunzip);
 
-const { TERMUX_PKG_CACHEDIR, TERMUX_PREFIX, TERMUX_ARCH } = process.env;
+const { TERMUX_SCRIPTDIR, TERMUX_PREFIX, TERMUX_ARCH } = process.env;
 
-if (!TERMUX_PKG_CACHEDIR) {
+if (!TERMUX_SCRIPTDIR) {
   throw new Error("TERMUX_PKG_CACHEDIR environment variable is not defined");
 }
 
@@ -22,7 +22,7 @@ if (!TERMUX_ARCH) {
 
 const binPrefix = TERMUX_PREFIX.substring(1) + "/bin/";
 const repos = JSON.parse(
-  await readFile(join(TERMUX_PKG_CACHEDIR, "repo.json")),
+  await readFile(join(TERMUX_SCRIPTDIR, "repo.json")),
 );
 
 /**
@@ -191,7 +191,7 @@ async function processRepo(repo, repoPath, arch) {
 
   // Now go through all the *.alternatives files in the repository and parse
   // them to find the alternatives and their dependents
-  repoPath = join(TERMUX_PKG_CACHEDIR, repoPath);
+  repoPath = join(TERMUX_SCRIPTDIR, repoPath);
   for await (const file of glob(`${repoPath}/*/*.alternatives`, {
     nodir: true,
   })) {
