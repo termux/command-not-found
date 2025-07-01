@@ -246,12 +246,6 @@ async function processRepo(repo, repoPath, arch) {
     });
   }
 
-  // Sort the binaries for each package in alphabetical order
-  // This is needed as the '*.alternatives' files are not guaranteed to be in any order
-  for (const packageName in binMap) {
-    binMap.get(packageName).sort();
-  }
-
   const headerFile = `commands-${arch}-${repo.name}.h`;
   const header = Array.from(binMap.keys())
     .sort()
