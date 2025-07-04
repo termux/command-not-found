@@ -3,6 +3,7 @@ import { glob, readFile, writeFile } from "node:fs/promises";
 import { gunzip } from "node:zlib";
 import { join } from "node:path";
 import { promisify } from "node:util";
+import assert from "node:assert/strict";
 
 const gunzipAsync = promisify(gunzip);
 
@@ -21,9 +22,11 @@ if (!TERMUX_ARCH) {
 }
 
 const binPrefix = TERMUX_PREFIX.substring(1) + "/bin/";
+/**@type {unknown}*/
 const repos = JSON.parse(
-  await readFile(join(TERMUX_SCRIPTDIR, "repo.json")),
+  await readFile(join(TERMUX_SCRIPTDIR, "repo.json"), "utf8"),
 );
+assert(typeof repos == "object" && repos);
 
 /**
  * Parses an alternative file and returns an array of alternative entries.
@@ -38,6 +41,7 @@ const repos = JSON.parse(
  * - `priority`: The priority of the alternative.
  *
  * Note that both the name and path do not start with TERMUX_PREFIX, but instead start with the relative path from TERMUX_PREFIX.
+ * @param {string} filePath
  */
 async function parseAlternativeFile(filePath) {
   const content = await readFile(filePath, "utf8");
@@ -55,7 +59,6 @@ async function parseAlternativeFile(filePath) {
     // Comment starts with a '#' and can be at the end of the line as well
     let match = line.match(/\s*#.*/);
     line = line.substring(0, match === null ? line.length : match.index);
-
 
     if (line.startsWith("Name: ")) {
       if (parsingDependents) {
@@ -138,6 +141,15 @@ async function parseAlternativeFile(filePath) {
   return alternatives;
 }
 
+/**
+@param {{
+  name: string,
+  url: URL,
+  distribution: string
+}} repo
+@param {string} repoPath
+@param {string} arch
+*/
 async function processRepo(repo, repoPath, arch) {
   // Fetch the Contents.gz file for the given architecture from the apt mirror
   const url = `${repo.url}/dists/${repo.distribution}/Contents-${arch}.gz`;
@@ -157,14 +169,20 @@ async function processRepo(repo, repoPath, arch) {
   // is the name of the package that provides this file.
   const lines = data.toString().split("\n");
 
-  // Stores mappings of binary names to package names
-  // The key is the binary name, and the value is an array of package names
-  // that provide this binary
+  /**
+   * Stores mappings of binary names to package names
+   * The key is the binary name, and the value is an array of package names
+   * that provide this binary
+   * @type {Map<string, string[]>}
+   */
   const binMap = new Map();
 
-  // Stores mappings of file paths to package names
-  // This is needed to resolve the package names for binaries that are setup
-  // using the alternatives system
+  /**
+   * Stores mappings of file paths to package names
+   * This is needed to resolve the package names for binaries that are setup
+   * using the alternatives system
+   * @type {Map<string, string>}
+   */
   const fileMap = new Map();
   // Populate the fileMap
   lines.forEach((line) => {
@@ -185,13 +203,13 @@ async function processRepo(repo, repoPath, arch) {
         if (!binMap.has(packageName)) {
           binMap.set(packageName, []);
         }
-        binMap.get(packageName).push(binary);
+        /**@type {string[]}*/ (binMap.get(packageName)).push(binary);
       });
     });
 
   // Now go through all the *.alternatives files in the repository and parse
   // them to find the alternatives and their dependents
-  repoPath = join(TERMUX_SCRIPTDIR, repoPath);
+  repoPath = join(/**@type {string}*/ (TERMUX_SCRIPTDIR), repoPath);
   for await (const file of glob(`${repoPath}/*/*.alternatives`, {
     nodir: true,
   })) {
@@ -214,7 +232,7 @@ async function processRepo(repo, repoPath, arch) {
         if (!binMap.has(packageName)) {
           binMap.set(packageName, []);
         }
-        binMap.get(packageName).push(binary);
+        /**@type {string[]}*/ (binMap.get(packageName)).push(binary);
         alternativeEntry.dependents.forEach(({ link, name: _, path }) => {
           if (link.startsWith("bin/")) {
             const depPackageName = fileMap.get(
@@ -224,7 +242,7 @@ async function processRepo(repo, repoPath, arch) {
             if (!binMap.has(depPackageName)) {
               binMap.set(depPackageName, []);
             }
-            binMap.get(depPackageName).push(depBinary);
+            /**@type {string[]}*/ (binMap.get(depPackageName)).push(depBinary);
           }
           // Register the link in the fileMap for the package
           // This is used by vim.alternatives where bin/vim is a link with alternative libexec/vim/vim
@@ -233,7 +251,7 @@ async function processRepo(repo, repoPath, arch) {
           if (!binMap.has(packageName)) {
             binMap.set(packageName, []);
           }
-          binMap.get(packageName).push(binary);
+          /**@type {string[]}*/ (binMap.get(packageName)).push(binary);
         });
       }
       // Register the link in the fileMap for the package
@@ -250,8 +268,7 @@ async function processRepo(repo, repoPath, arch) {
   const header = Array.from(binMap.keys())
     .sort()
     .map((packageName) => {
-      const binaries = binMap
-        .get(packageName)
+      const binaries = /**@type {string[]}*/ (binMap.get(packageName))
         .sort()
         .map((bin) => `" ${bin}",`);
       return `"${packageName}",\n${binaries.join("\n")}`;
@@ -261,12 +278,32 @@ async function processRepo(repo, repoPath, arch) {
   await writeFile(headerFile, header);
 }
 
+/**
+@type {Promise<void>[]}
+*/
 const promises = [];
 
 for (const path in repos) {
   if (path === "pkg_format") continue;
+
+  //@ts-expect-error
   const repo = repos[path];
-  promises.push(processRepo(repo, path, TERMUX_ARCH));
+  assert(typeof repo == "object" && repo);
+  assert("name" in repo && typeof repo.name == "string");
+  assert("url" in repo && typeof repo.url == "string");
+  assert("distribution" in repo && typeof repo.distribution == "string");
+
+  promises.push(
+    processRepo(
+      {
+        name: repo.name,
+        url: new URL(repo.url),
+        distribution: repo.distribution,
+      },
+      path,
+      TERMUX_ARCH,
+    ),
+  );
 }
 
 await Promise.all(promises);
