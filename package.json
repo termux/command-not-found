@@ -1,4 +1,13 @@
 {
+  "name": "cmd-not-found-gen-db",
   "type": "module",
-  "private": true
+  "private": true,
+  "version": "0.1.0",
+  "bugs": "https://github.com/termux/command-not-found/issues",
+  "repository": "github:termux/command-not-found",
+  "devDependencies": {
+    "@types/node": "^24.0.10",
+    "prettier": "^3.6.2",
+    "typescript": "^5.8.3"
+  }
 }
