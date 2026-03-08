@@ -139,7 +139,11 @@ async function fetchURL(url) {
   if (url.startsWith("file:///")) {
     return await readFile(url.substring('file://'.length));
   }
-  return await fetch(url);
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`${url} returned ${response.status}`);
+  }
+  return await response.arrayBuffer();
 }
 
 async function processRepo(repo, repoPath, arch) {
@@ -147,12 +151,8 @@ async function processRepo(repo, repoPath, arch) {
   const url = `${repo.url}/dists/${repo.distribution}/Contents-${arch}.gz`;
   const response = await fetchURL(url);
 
-  if (!response.ok) {
-    throw new Error(`${url} returned ${response.status}`);
-  }
-
   // Since we are using a gzip file, we need to decompress it
-  const data = await gunzipAsync(await response.arrayBuffer());
+  const data = await gunzipAsync(await response);
   // Convert to string and split by new lines
   // Each line is of the format:
   // "path/to/file package"
