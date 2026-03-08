@@ -135,10 +135,17 @@ async function parseAlternativeFile(filePath) {
   return alternatives;
 }
 
+async function fetchURL(url) {
+  if (url.startsWith("file:///")) {
+    return await readFile(url.substring('file://'.length));
+  }
+  return await fetch(url);
+}
+
 async function processRepo(repo, repoPath, arch) {
   // Fetch the Contents.gz file for the given architecture from the apt mirror
   const url = `${repo.url}/dists/${repo.distribution}/Contents-${arch}.gz`;
-  const response = await fetch(url);
+  const response = await fetchURL(url);
 
   if (!response.ok) {
     throw new Error(`${url} returned ${response.status}`);
