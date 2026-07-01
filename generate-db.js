@@ -22,6 +22,7 @@ if (!TERMUX_ARCH) {
 
 const binPrefix = TERMUX_PREFIX.substring(1) + "/bin/";
 const repos = JSON.parse(await readFile(join(TERMUX_SCRIPTDIR, "repo.json")));
+const pkg_format = repos["pkg_format"];
 
 /**
  * Parses an alternative file and returns an array of alternative entries.
@@ -147,48 +148,79 @@ async function fetchURL(url) {
 }
 
 async function processRepo(repo, repoPath, arch) {
-  // Fetch the Contents.gz file for the given architecture from the apt mirror
-  const url = `${repo.url}/dists/${repo.distribution}/Contents-${arch}.gz`;
+  var url;
+  if (pkg_format === "debian")
+    // Fetch the Contents.gz file for the given architecture from the apt mirror
+    url = `${repo.url}/dists/${repo.distribution}/Contents-${arch}.gz`;
+  else if (pkg_format === "pacman")
+    // Fetch the ${repo}.files file for the given architecture from the pacman mirror
+    url = `${repo.url}/${arch}/${repo.distribution}.files`;
   const response = await fetchURL(url);
 
   // Since we are using a gzip file, we need to decompress it
   const data = await gunzipAsync(await response);
   // Convert to string and split by new lines
-  // Each line is of the format:
-  // "path/to/file package"
-  //
-  // Where `path/to/file` is the path to the file in the package, and `package`
-  // is the name of the package that provides this file.
   const lines = data.toString().split("\n");
-
-  // Stores mappings of binary names to package names
-  // The key is the binary name, and the value is an array of package names
-  // that provide this binary
-  const binMap = new Map();
 
   // Stores mappings of file paths to package names
   // This is needed to resolve the package names for binaries that are setup
   // using the alternatives system
   const fileMap = new Map();
   // Populate the fileMap
-  lines.forEach((line) => {
-    const [path, packageName] = line.split(" ");
-    fileMap.set(path, packageName);
-  });
+  if (pkg_format === "debian")
+    // Each line is of the format:
+    // "path/to/file package"
+    //
+    // Where `path/to/file` is the path to the file in the package, and `package`
+    // is the name of the package that provides this file.
+    lines.forEach((line) => {
+      const [path, packageName] = line.split(" ");
+      fileMap.set(path, packageName);
+    });
+  else if (pkg_format === "pacman") {
+    // Data format:
+    //  {package}/desc...%FILENAME%
+    //  {package information}
+    //  {package}/files...%FILES%
+    //  {package paths}
+    //
+    // - {package} is the package name with its version binding
+    // - {package information} are lines with all the meta information about the
+    //   package, need to skip
+    // - {package paths} are lines with all the paths that are in the package, only
+    //   file paths need to be processed (i.e., directory paths should be ignored)
+    var getLine = false;
+    var pkgname;
+    lines.forEach((line) => {
+      line = line.replace(/[^a-zA-Z0-9\s\p{P}\p{S}]/gu, "");
+      if (line.includes("/desc") && line.endsWith("%FILENAME%"))
+        getLine = false;
+      else if (line.includes('/files') && line.endsWith("%FILES%")) {
+        pkgname = line.split("/")[0].split('-').slice(0, -2).join('-');
+        getLine = true;
+      } else if (getLine && line != "" && !line.endsWith("/")) {
+          if (!fileMap.has(line))
+            fileMap.set(line, pkgname);
+          else
+            fileMap.set(line, fileMap.get(line)+","+pkgname);
+      }
+    });
+  }
 
-  // Now filter the entries from Contents.gz that have binaries, and store them
+  // Stores mappings of binary names to package names
+  // The key is the binary name, and the value is an array of package names
+  // that provide this binary
+  const binMap = new Map();
+
+  // Now filter the entries from fileMap that have binaries, and store them
   // in binMap
-  lines
-    .filter((line) => line.startsWith(binPrefix))
-    .forEach((line) => {
-      const [pathToBinary, packageNames] = line.split(" ");
+  Array.from(fileMap.entries())
+    .filter(([pathToBinary, packagesName]) => pathToBinary.startsWith(binPrefix))
+    .forEach(([pathToBinary, packagesName]) => {
       const binary = pathToBinary.substring(pathToBinary.lastIndexOf("/") + 1);
-      const packages = packageNames.split(",");
-
-      packages.forEach((packageName) => {
-        if (!binMap.has(packageName)) {
+      packagesName.split(",").forEach((packageName) => {
+        if (!binMap.has(packageName))
           binMap.set(packageName, []);
-        }
         binMap.get(packageName).push(binary);
       });
     });
